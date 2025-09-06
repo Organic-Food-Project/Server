@@ -1,0 +1,8 @@
+What i need for the project:
+
+1.CRUD for user(username , email , password , imageURL , {order History object})
+2.CRUD for product(name , price ,,imagesURL)
+3.authentication and authrization
+4. Error Handling
+5.pagination
+6. payment getaway 
