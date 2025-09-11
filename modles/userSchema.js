@@ -1,29 +1,29 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+require("dotenv").config();
 const userSchema = mongoose.Schema(
   {
     firstName: { type: String, required: false },
-    lastNmae: { type: String, required: false },
+    lastName: { type: String, required: false },
     email: {
-      type: string,
+      type: String,
       required: [true, "Email is Required."],
       unique: true,
     },
-    Phone_Number: { type: String, required: false , default:"+20 1020153016"},
-    password: { type: String, required: [true, , "Password is Required."] },
-    ImageURL: { type: String, required: false },
-    history: { type: Object, required: false },
-    token: { type: String },
+    Phone_Number: { type: String, required: false},
+    password: { type: String, required: [true, "Password is Required."] },
+    Profile_Image_URL: { type: String, required: false },
+    purchase_history: { type: Array, required: false },
   },
-  { timestamp: true }
+  { timestamps: true }
 );
 
-userSchema.pre("save", (next) => {
+userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
-  bcrypt.hashSync(this.password, 12);
+  this.password = bcrypt.hashSync(this.password, process.env.SALT_FOR_PASSWORD);
   next();
 });
 
-const User = mongoose.module("User", userSchema);
+const User = mongoose.model("User", userSchema);
 
 module.exports = User;

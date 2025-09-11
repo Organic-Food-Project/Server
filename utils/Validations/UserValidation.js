@@ -1,16 +1,19 @@
 const joi = require("joi");
 
-exports.CreatUserSchema = joi.object({
+exports.SignUpSchema = joi.object({
   email: joi.string().email().required(),
   password: joi.string().required(),
   confirmPassword: joi.string().required(),
 });
-exports.loginSchema = CreatUserSchema.fork(["email", "password"]);
+exports.loginSchema = joi.object({
+  email: joi.string().email().required(),
+  password: joi.string().required(),
+});
 exports.UpdateUserSchema = joi.object({
   firstName: joi.string().optional(),
   lastName: joi.string().optional(),
   email: joi.string().email().optional(),
-  Phone_Number: joi.string().max(13).startswith("+").optional(),
+  Phone_Number: joi.string().max(13).optional(),
 });
 exports.UpdateImage = joi.object({
   ImageURL: joi.string().optional(),
