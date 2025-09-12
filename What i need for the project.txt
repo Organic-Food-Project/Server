@@ -6,3 +6,9 @@ What i need for the project:
 4. Error Handling
 5.pagination
 6. payment getaway 
+
+
+
+product : 
+search => search  with whaterver the user writes if he wrote 'a' give him everything the starts or has 'a' in it  
+filter => 
