@@ -44,9 +44,9 @@ exports.UpdatePassword = async (req, res , next) => {
     if (!decode || NewPassword !== confirmPassword) {
       throw new AppError("Make Sure All Passwords Are Correct.", 400);
     }
-    const hashedPassword = bcrypt.hash(
+    const hashedPassword = await bcrypt.hash(
       NewPassword,
-      process.env.SALT_FOR_PASSWORD
+      parseInt(process.env.SALT_FOR_PASSWORD)
     );
     user = await User.findOneAndUpdate(
       { email: req.user.email },
