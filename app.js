@@ -23,3 +23,9 @@ app.use((err, req, res, next) => {
 });
 
 module.exports = app;
+
+if (process.env.NODE_ENV !== "production") {
+  app.listen(process.env.PORT, () => {
+    console.log(`local on port ${process.env.PORT}`);
+  });
+}
