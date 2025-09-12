@@ -3,7 +3,7 @@ const AppError = require("../utils/AppError");
 const JWT = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
-exports.signup = async (req, res) => {
+exports.signup = async (req, res , next) => {
   try {
     const { email, password, confirmPassword } = req.body;
     const user = await User.findOne({ email });

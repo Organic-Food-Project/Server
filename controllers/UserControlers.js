@@ -6,7 +6,7 @@ exports.getUser = async (req, res) => {
   res.status(200).json({ user: req.body });
 };
 
-exports.updateuser = async (req, res) => {
+exports.updateuser = async (req, res , next) => {
   try {
     const allowedFileds = ["firstName", "lastName", "email", "Phone_Number"];
     let updates = {};
@@ -33,7 +33,7 @@ exports.updateuser = async (req, res) => {
   }
 };
 
-exports.UpdatePassword = async (req, res) => {
+exports.UpdatePassword = async (req, res , next) => {
   try {
     const { currentPassword, NewPassword, confirmPassword } = req.body;
     let user = await User.findOne({ email: req.user.email });
@@ -57,9 +57,9 @@ exports.UpdatePassword = async (req, res) => {
     next(err);
   }
 };
-exports.UpdateImage = async (req, res) => {};
+exports.UpdateImage = async (req, res , next) => {};
 
-exports.deleteUser = async (req, res) => {
+exports.deleteUser = async (req, res , next) => {
   try {
     const user = await User.findOneAndDelete({ email: req.user.email });
     if (!user) {
