@@ -17,7 +17,7 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   const status = err.statusCode || 500;
   const message = err.message || "Internal Error";
-  req.status(status).json({ message });
+  res.status(status).json({ message });
 });
 mongoose
   .connect(uri)
