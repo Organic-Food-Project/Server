@@ -4,15 +4,21 @@ const app = express();
 const UserRouter = require("./routes/userRoutes");
 const mongoose = require("mongoose");
 const connectDB = require("./Mongodb");
+const cors = require("cors");
+
 const uri = process.env.MONGODB_URI.replace(
   "<db_password>",
   process.env.ATLAS_PASSWORD
 );
 app.use(express.json());
+app.use(cors({
+  origin:["http:localhost:3000" , `${process.env.FrontEnd}`],
+  credentials:true
+}))
 app.use("/api/v1/users", UserRouter);
 
 app.get("/", (req, res) => {
-  res.send("Hello WOrld");
+  res.send("Server Running");
 });
 connectDB(uri);
 app.use((err, req, res, next) => {
