@@ -3,7 +3,7 @@ const AppError = require("../utils/AppError");
 const JWT = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
-exports.signup = async (req, res , next) => {
+exports.signup = async (req, res, next) => {
   try {
     const { email, password, confirmPassword } = req.body;
     const user = await User.findOne({ email });
@@ -25,6 +25,7 @@ exports.signup = async (req, res , next) => {
 exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    console.log(req.body);
     const user = await User.findOne({ email });
     if (!user) {
       throw new AppError("Email Or Password Are not Correct", 404);
