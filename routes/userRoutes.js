@@ -12,5 +12,6 @@ Router.delete("/delete", auth.protect, user.deleteUser);
 Router.get("/", auth.protect, user.getUser);
 Router.put("/updatepassword", auth.protect, user.UpdatePassword);
 Router.put("/updateuser", auth.protect, user.updateuser);
+Router.get("/allusers", auth.protect, user.getallusers);
 //
 module.exports = Router;

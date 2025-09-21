@@ -2,11 +2,23 @@ const User = require("../modles/userSchema");
 const AppError = require("../utils/AppError");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
+exports.getallusers = async (req, res, next) => {
+  try {
+    const user = req.user;
+    if (user.role === "admin") {
+      res.status(200).json({ users: await User.find() });
+    } else {
+      throw new AppError("You Are Not Allowed To view This.", 400);
+    }
+  } catch (err) {
+    next(err);
+  }
+};
 exports.getUser = async (req, res) => {
   res.status(200).json({ user: req.user });
 };
 
-exports.updateuser = async (req, res , next) => {
+exports.updateuser = async (req, res, next) => {
   try {
     const allowedFileds = ["firstName", "lastName", "email", "Phone_Number"];
     let updates = {};
@@ -33,7 +45,7 @@ exports.updateuser = async (req, res , next) => {
   }
 };
 
-exports.UpdatePassword = async (req, res , next) => {
+exports.UpdatePassword = async (req, res, next) => {
   try {
     const { currentPassword, NewPassword, confirmPassword } = req.body;
     let user = await User.findOne({ email: req.user.email });
@@ -57,15 +69,22 @@ exports.UpdatePassword = async (req, res , next) => {
     next(err);
   }
 };
-exports.UpdateImage = async (req, res , next) => {};
+exports.UpdateImage = async (req, res, next) => {};
 
-exports.deleteUser = async (req, res , next) => {
+exports.deleteUser = async (req, res, next) => {
   try {
     const user = await User.findOneAndDelete({ email: req.user.email });
     if (!user) {
       throw new AppError("Can't Delete This user.", 400);
     }
     res.status(200).json({ message: "User Deleted Successfuly." });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.comment = async (req, res, next) => {
+  try {
   } catch (err) {
     next(err);
   }
