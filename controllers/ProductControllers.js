@@ -1,11 +1,12 @@
 const file = require("../modles/porductSchema");
 const Products = file.Products;
 const Catogaries = require("../modles/categariesSchema");
+const Response = require("../middlerwares/Response");
 const AppError = require("../utils/AppError");
 exports.getAllProducts = async (req, res, next) => {
   try {
     const products = await Products.find();
-    res.status(200).json({ products });
+    Response(res, 200, products);
   } catch (err) {
     next(err);
   }
@@ -20,7 +21,7 @@ exports.getProductByName = async (req, res, next) => {
     if (!product) {
       throw new AppError("Product Not Found", 404);
     }
-    res.status(200).json({ product });
+    Response(res, 200, product);
   } catch (err) {
     next(err);
   }
@@ -55,9 +56,7 @@ exports.addNewProduct = async (req, res, next) => {
     cat.products.push(product._id);
     cat.count += product.quantity;
     await cat.save();
-    res
-      .status(201)
-      .json({ status: "Success", message: "Product Created.", product });
+    Response(res, 201, product);
   } catch (err) {
     next(err);
   }
@@ -73,9 +72,7 @@ exports.updateProduct = async (req, res, next) => {
     if (!product) {
       throw new AppError("Product Not Found", 404);
     }
-    res
-      .status(201)
-      .json({ status: "Success", message: "Product Edited Succesfuly" });
+    Response(res, 201, "Product Edited Succesfuly");
   } catch (err) {
     next(err);
   }
@@ -90,11 +87,11 @@ exports.deleteProduct = async (req, res, next) => {
     if (!name) {
       throw new AppError("Id not found Make Sure To add it after URL", 400);
     }
-    const product = Products.findOneAndDelete({ name });
+    const product = await Products.findOneAndDelete({ name });
     if (!product) {
       throw new AppError("Product Not Found", 404);
     }
-    res.status(200).json({ message: "Product Deleted Successfuly" });
+    Response(res, 200, "Product Deleted Successfuly");
   } catch (err) {
     next(err);
   }

@@ -1,9 +1,10 @@
 const Categories = require("../modles/categariesSchema");
+const Response = require("../middlerwares/Response");
 const AppError = require("../utils/AppError");
 exports.getallCategories = async (req, res, next) => {
   try {
     const categories = await Categories.find();
-    res.status(200).json({ categories });
+    Response(res, 200, categories);
   } catch (err) {
     console.error(err);
   }
@@ -30,9 +31,7 @@ exports.addCategory = async (req, res, next) => {
       count,
       image,
     });
-    res
-      .status(201)
-      .json({ status: "Success", message: "Added The New Category!" });
+    Response(res, 201, "New Category Added");
   } catch (err) {
     next(err);
   }
@@ -51,9 +50,7 @@ exports.deleteCategory = async (req, res, next) => {
     if (!cat) {
       throw new AppError("Category Not Found", 404);
     }
-    res
-      .status(201)
-      .json({ status: "Success", message: "Category Deleted Successfuly" });
+    Response(res, 201, "Category Deleted Successfuly");
   } catch (err) {
     next(err);
   }

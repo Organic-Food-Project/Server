@@ -8,7 +8,7 @@ exports.signup = async (req, res, next) => {
     const { email, password, confirmPassword } = req.body;
     const user = await User.findOne({ email });
     if (user) {
-      throw new AppError("This Email Already Exists.", 400);
+      throw new AppError("This Email Already Exists.", 409);
     }
     if (confirmPassword !== password) {
       throw new AppError("Make Sure Passwords Match!", 400);
