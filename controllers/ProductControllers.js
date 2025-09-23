@@ -12,10 +12,13 @@ exports.getAllProducts = async (req, res, next) => {
 };
 exports.getProductByName = async (req, res, next) => {
   try {
-    const { name } = req.body;
+    const { name } = req.body || {};
+    if (!name) {
+      throw new AppError("Please Provide The Name OF the Product.", 400);
+    }
     const product = await Products.findOne({ name });
     if (!product) {
-      res.status(404).json({ message: "Product Not Found" });
+      throw new AppError("Product Not Found", 404);
     }
     res.status(200).json({ product });
   } catch (err) {
