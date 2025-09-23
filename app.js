@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const UserRouter = require("./routes/userRoutes");
+const ProductRouter = require("./routes/ProductRoutes");
+const CategoryRouter = require("./routes/CategoryRoutes");
 const mongoose = require("mongoose");
 const connectDB = require("./Mongodb");
 const cors = require("cors");
@@ -19,6 +21,8 @@ app.use(
   })
 );
 app.use("/api/v1/users", UserRouter);
+app.use("/api/v1/products", ProductRouter);
+app.use("/api/v1/categories", CategoryRouter);
 
 app.get("/", (req, res) => {
   res.send("Server Running");
