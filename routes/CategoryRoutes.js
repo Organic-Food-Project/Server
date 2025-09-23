@@ -4,7 +4,7 @@ const Cats = require("../controllers/CategoryController");
 const auth = require("../controllers/authControllers");
 
 Router.get("/", Cats.getallCategories);
-Router.post("/addcategory", auth.protect, Cats.addCategory);
+Router.post("/", auth.protect, Cats.addCategory);
 Router.delete("/:name", auth.protect, Cats.deleteCategory);
 
 module.exports = Router;

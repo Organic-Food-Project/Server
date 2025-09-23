@@ -5,7 +5,7 @@ const auth = require("../controllers/authControllers");
 //
 Router.get("/", Products.getAllProducts);
 Router.get("/:name", Products.getProductByName);
-Router.post("/AddProduct", auth.protect, Products.addNewProduct);
+Router.post("/", auth.protect, Products.addNewProduct);
 Router.delete("/:name", auth.protect, Products.deleteProduct);
 
 module.exports = Router;
