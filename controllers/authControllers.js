@@ -25,7 +25,7 @@ exports.signup = async (req, res, next) => {
 exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    console.log(req.body);
+
     const user = await User.findOne({ email });
     if (!user) {
       throw new AppError("Email Or Password Are not Correct", 404);
@@ -44,11 +44,12 @@ exports.login = async (req, res, next) => {
 };
 exports.protect = async (req, res, next) => {
   try {
-    const { token } = req.body || {};
+    const header = await req.get("Authorization");
+    const token = header.replace("Bearer ", "");
     if (!token) {
       throw new AppError("Please Provide Token", 401);
     }
-    const confirm = await JWT.verify(token, process.env.JWT_SECRET);
+    const confirm = JWT.verify(token, process.env.JWT_SECRET);
     if (!confirm) {
       throw new AppError("Not Allowed , Please Re-login.", 401);
     }
