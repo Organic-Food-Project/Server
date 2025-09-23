@@ -43,7 +43,7 @@ exports.deleteCategory = async (req, res, next) => {
     if (!user || user.role !== "admin") {
       throw new AppError("You Are Not Allowed To Do This.", 403);
     }
-    const { name } = req.body || {};
+    const { name } = req.params || {};
     if (!name) {
       throw new AppError("Provide What You Want To Delete", 400);
     }

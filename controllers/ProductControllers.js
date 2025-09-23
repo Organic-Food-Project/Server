@@ -12,7 +12,7 @@ exports.getAllProducts = async (req, res, next) => {
 };
 exports.getProductByName = async (req, res, next) => {
   try {
-    const { name } = req.body || {};
+    const { name } = req.params || {};
     if (!name) {
       throw new AppError("Please Provide The Name OF the Product.", 400);
     }
@@ -86,7 +86,10 @@ exports.deleteProduct = async (req, res, next) => {
     if (!user || user.role !== "admin") {
       throw new AppError("You Are Not Allowed To Do This.", 403);
     }
-    const { name } = req.body;
+    const { name } = req.params || {};
+    if (!name) {
+      throw new AppError("Id not found Make Sure To add it after URL", 400);
+    }
     const product = Products.findOneAndDelete({ name });
     if (!product) {
       throw new AppError("Product Not Found", 404);

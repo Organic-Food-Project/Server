@@ -45,6 +45,9 @@ exports.login = async (req, res, next) => {
 exports.protect = async (req, res, next) => {
   try {
     const header = await req.get("Authorization");
+    if (!header) {
+      throw new AppError("No Authorization Token Found.", 401);
+    }
     const token = header.replace("Bearer ", "");
     if (!token) {
       throw new AppError("Please Provide Token", 401);
