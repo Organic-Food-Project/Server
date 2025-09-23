@@ -5,11 +5,10 @@ require("dotenv").config();
 exports.getallusers = async (req, res, next) => {
   try {
     const user = req.user;
-    if (user.role === "admin") {
-      res.status(200).json({ users: await User.find() });
-    } else {
-      throw new AppError("You Are Not Allowed To view This.", 400);
+    if (user.role !== "admin") {
+      throw new AppError("You Are Not Allowed To view This.", 403);
     }
+    res.status(200).json({ users: await User.find() });
   } catch (err) {
     next(err);
   }
@@ -30,7 +29,7 @@ exports.updateuser = async (req, res, next) => {
     const user = req.user;
 
     if (!user) {
-      throw new AppError("User Not Found.");
+      throw new AppError("User Not Found.", 404);
     }
     const updatedUser = await User.findOneAndUpdate(
       { email: user.email },
@@ -75,7 +74,7 @@ exports.deleteUser = async (req, res, next) => {
   try {
     const user = await User.findOneAndDelete({ email: req.user.email });
     if (!user) {
-      throw new AppError("Can't Delete This user.", 400);
+      throw new AppError("User Not Found.", 404);
     }
     res.status(200).json({ message: "User Deleted Successfuly." });
   } catch (err) {
@@ -85,6 +84,26 @@ exports.deleteUser = async (req, res, next) => {
 
 exports.comment = async (req, res, next) => {
   try {
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.AdminDeleteUser = async (req, res, next) => {
+  try {
+    const user = req.user;
+    if (user.role !== "admin") {
+      throw new AppError("You Are Not Allowed Here", 403);
+    }
+    const { email } = req.body;
+    if (!email) {
+      throw new AppError("Make Sure To provide the email", 400);
+    }
+    const targetUser = await User.findOneAndDelete({ email });
+    if (!targetUser) {
+      throw new AppError("User Not Found", 404);
+    }
+    res.status(200).json({ message: "Target Deleted Successfuly." });
   } catch (err) {
     next(err);
   }

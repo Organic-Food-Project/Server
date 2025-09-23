@@ -8,6 +8,7 @@ const AppError = require("../utils/AppError");
 
 Router.post("/signup", AppError.validate(schemas.SignUpSchema), auth.signup);
 Router.post("/login", AppError.validate(schemas.loginSchema), auth.login);
+Router.delete("/admindelete", auth.protect, user.AdminDeleteUser);
 Router.delete("/delete", auth.protect, user.deleteUser);
 Router.get("/", auth.protect, user.getUser);
 Router.put("/updatepassword", auth.protect, user.UpdatePassword);
