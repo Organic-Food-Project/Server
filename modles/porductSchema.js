@@ -27,7 +27,7 @@ const ProductSchema = mongoose.Schema(
       type: String,
       required: true,
       enum: [
-        "Fresh_Fruit",
+        "Fresh Fruit",
         "Vegetables",
         "Cooking",
         "Snacks",

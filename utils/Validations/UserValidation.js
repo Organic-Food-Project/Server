@@ -2,12 +2,12 @@ const joi = require("joi");
 
 exports.SignUpSchema = joi.object({
   email: joi.string().email().required(),
-  password: joi.string().required(),
+  password: joi.string().min(6).required(),
   confirmPassword: joi.string().required(),
 });
 exports.loginSchema = joi.object({
   email: joi.string().email().required(),
-  password: joi.string().required(),
+  password: joi.string().min(6).required(),
 });
 exports.UpdateUserSchema = joi.object({
   firstName: joi.string().optional(),

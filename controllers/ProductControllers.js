@@ -41,13 +41,14 @@ exports.addNewProduct = async (req, res, next) => {
     if (checkName) {
       throw new AppError("This Product Already Exists", 400);
     }
-    const cat = await Catogaries.findOne({ name: category });
+    const cat = await Catogaries.findOne({ _id: category });
     if (!cat) {
       throw new AppError("Catogery Does Not Exist.", 404);
     }
+    const catsname = cat.name;
     const product = await Products.create({
       description,
-      category,
+      catsname,
       quantity,
       price,
       images,
@@ -83,11 +84,11 @@ exports.deleteProduct = async (req, res, next) => {
     if (!user || user.role !== "admin") {
       throw new AppError("You Are Not Allowed To Do This.", 403);
     }
-    const { name } = req.params || {};
-    if (!name) {
+    const { id } = req.params || {};
+    if (!id) {
       throw new AppError("Id not found Make Sure To add it after URL", 400);
     }
-    const product = await Products.findOneAndDelete({ name });
+    const product = await Products.findOneAndDelete({ _id: id });
     if (!product) {
       throw new AppError("Product Not Found", 404);
     }

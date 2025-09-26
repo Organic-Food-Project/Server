@@ -42,11 +42,11 @@ exports.deleteCategory = async (req, res, next) => {
     if (!user || user.role !== "admin") {
       throw new AppError("You Are Not Allowed To Do This.", 403);
     }
-    const { name } = req.params || {};
-    if (!name) {
+    const { id } = req.params || {};
+    if (!id) {
       throw new AppError("Provide What You Want To Delete", 400);
     }
-    const cat = await Categories.findOneAndDelete({ name });
+    const cat = await Categories.findOneAndDelete({ _id:id });
     if (!cat) {
       throw new AppError("Category Not Found", 404);
     }
