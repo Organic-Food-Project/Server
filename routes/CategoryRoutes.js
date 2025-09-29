@@ -9,7 +9,7 @@ Router.get("/", Cats.getallCategories);
 Router.post(
   "/",
   upload.single("image"),
-  ImageValidate,
+  ImageValidate(false),
   auth.protect,
   Cats.addCategory
 );
