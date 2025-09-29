@@ -1,6 +1,7 @@
 const Categories = require("../modles/categariesSchema");
 const Response = require("../middlerwares/Response");
 const AppError = require("../utils/AppError");
+const UploadImage = require("../middlerwares/Image_kit");
 exports.getallCategories = async (req, res, next) => {
   try {
     const categories = await Categories.find();
@@ -15,7 +16,8 @@ exports.addCategory = async (req, res, next) => {
     if (!user || user.role !== "admin") {
       throw new AppError("You Are Not Allowed To Do This.", 403);
     }
-    const { name, count, image } = req.body || {};
+    const image = await UploadImage(req)
+    const { name, count} = req.body || {};
     if (!name || count || !image) {
       throw new AppError(
         "Please Provide (name & count = 0 & image) for the category",
