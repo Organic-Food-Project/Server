@@ -1,4 +1,3 @@
-const AppError = require("../utils/AppError");
 const ImageKit = require("imagekit");
 
 const imagekit = new ImageKit({
@@ -7,32 +6,23 @@ const imagekit = new ImageKit({
   urlEndpoint: process.env.IMAGEKIT_ENDPOINT,
 });
 
-const UploadImage = (isMultipleFiles) => {
-  return async (req, res, next) => {
-    try {
-      if (
-        (!isMultipleFiles && !req.file) ||
-        (isMultipleFiles && (!req.files || req.files.length === 0))
-      ) {
-        throw new AppError("Please Make Sure You Add image/images", 400);
-      }
+async function UploadImage(req) {
+  let files = [];
 
-      const files = isMultipleFiles ? req.files : [req.file];
-      const uploadPromises = files.map((file) => {
-        return imagekit.upload({
-          file: file.buffer,
-          fileName: `${Date.now()}_${file.originalname}`,
-          folder: "uploads",
-        });
-      });
-      const results = await Promise.all(uploadPromises);
-      req.images = results.map((r) => r.url);
-      next();
-    } catch (err) {
-      console.error("ImageKit Error\n");
-      next(err);
-    }
-  };
-};
+  if (req.files && Array.isArray(req.files)) {
+    files = req.files;
+  } else if (req.file) {
+    files = [req.file];
+  }
+  const uploadPromises = files.map((file) => {
+    return imagekit.upload({
+      file: file.buffer,
+      fileName: `${Date.now()}_${file.originalname}`,
+      folder: "uploads",
+    });
+  });
+  const results = await Promise.all(uploadPromises);
+  return results.map((r) => r.url);
+}
 
 module.exports = UploadImage;

@@ -2,6 +2,7 @@ const User = require("../modles/userSchema");
 const AppError = require("../utils/AppError");
 const Response = require("../middlerwares/Response");
 const bcrypt = require("bcrypt");
+const UploadImage = require("../middlerwares/Image_kit");
 require("dotenv").config();
 exports.getallusers = async (req, res, next) => {
   try {
@@ -69,7 +70,7 @@ exports.UpdatePassword = async (req, res, next) => {
   }
 };
 exports.UpdateImage = async (req, res, next) => {
-  const images = req.images;
+  const images = await UploadImage(req);
   const user = req.user;
   if (!images) {
     throw new AppError("Please Provide Profile Image", 400);

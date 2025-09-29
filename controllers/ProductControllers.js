@@ -3,6 +3,7 @@ const Products = file.Products;
 const Catogaries = require("../modles/categariesSchema");
 const Response = require("../middlerwares/Response");
 const AppError = require("../utils/AppError");
+const UploadImage = require("../middlerwares/Image_kit");
 exports.getAllProducts = async (req, res, next) => {
   try {
     const products = await Products.find();
@@ -36,9 +37,8 @@ exports.addNewProduct = async (req, res, next) => {
     if (!user || user.role !== "admin") {
       throw new AppError("You Are Not Allowed To Do This.", 403);
     }
-    const images = req.images;
     const { description, category, quantity, price, name } = req.body || {};
-    if (!description || !category || !quantity || !price || !images || !name) {
+    if (!description || !category || !quantity || !price || !name) {
       throw new AppError("Make Sure You Added All The Data.", 400);
     }
     const checkName = await Products.findOne({ name });
@@ -49,13 +49,17 @@ exports.addNewProduct = async (req, res, next) => {
     if (!cat) {
       throw new AppError("Catogery Does Not Exist.", 404);
     }
+    const images = await UploadImage(req);
+    if (!images) {
+      throw new AppError(`"Image Is Empty" ${images}`, 500);
+    }
     const catsname = cat.name;
     const product = await Products.create({
       description,
-      catsname,
+      category: catsname,
+      images,
       quantity,
       price,
-      images,
       name,
     });
     cat.products.push(product._id);

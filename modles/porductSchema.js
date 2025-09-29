@@ -10,18 +10,14 @@ const commentsSchema = mongoose.Schema(
 const ProductSchema = mongoose.Schema(
   {
     name: { type: String, required: true, unique: true },
-    images: {
-      type: [String],
-      required: true,
-      validate: {
-        validator: (arr) => {
-          return arr.length > 0;
-        },
-        message: "Image Can not Be Empty",
-      },
-    },
+    images: { type: [String] },
     rate: { type: Number, default: 1.5 },
-    price: { type: Number, required: true, default: 16.5 },
+    price: {
+      type: Number,
+      required: true,
+      min: [1, "Product Can't Go Below 1$"],
+      max: [1500, "Product Cant be More Than 1500$"],
+    },
     quantity: { type: Number, required: true, default: 5 },
     category: {
       type: String,
@@ -36,7 +32,7 @@ const ProductSchema = mongoose.Schema(
         "Bread & Bakery",
       ],
     },
-    feddBack: { type: [commentsSchema] , default:[]},
+    feddBack: { type: [commentsSchema], default: [] },
     description: {
       type: String,
       required: true,
