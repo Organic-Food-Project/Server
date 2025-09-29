@@ -8,8 +8,8 @@ const ImageValidate = (isProduct) => {
       if (!files || files.length === 0) {
         return next(new AppError("Make Sure You Provide The Images", 400));
       }
-      if (isProduct && files.length != 4) {
-        return next(new AppError("A Product Needs 4 images", 400));
+      if (isProduct && (files.length > 4 || files.length <= 0)) {
+        return next(new AppError("A Product Needs Atleast 4 images", 400));
       }
       for (const file of files) {
         const type = await file_type.fromBuffer(file.buffer);
