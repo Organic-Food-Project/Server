@@ -68,7 +68,14 @@ exports.UpdatePassword = async (req, res, next) => {
     next(err);
   }
 };
-exports.UpdateImage = async (req, res, next) => {};
+exports.UpdateImage = async (req, res, next) => {
+  const images = req.images;
+  const user = req.user;
+  if (!images) {
+    throw new AppError("Please Provide Profile Image", 400);
+  }
+  user.Profile_Image_URL = images;
+};
 
 exports.deleteUser = async (req, res, next) => {
   try {

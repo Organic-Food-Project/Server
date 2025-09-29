@@ -17,7 +17,11 @@ exports.getProductByName = async (req, res, next) => {
     if (!name) {
       throw new AppError("Please Provide The Name OF the Product.", 400);
     }
-    const product = await Products.findOne({ name });
+    name.toLowerCase();
+    const product = await Products.findOne({ name }).collation({
+      locale: "en",
+      strength: 2,
+    });
     if (!product) {
       throw new AppError("Product Not Found", 404);
     }
@@ -32,8 +36,8 @@ exports.addNewProduct = async (req, res, next) => {
     if (!user || user.role !== "admin") {
       throw new AppError("You Are Not Allowed To Do This.", 403);
     }
-    const { description, category, quantity, price, images, name } =
-      req.body || {};
+    const images = req.images;
+    const { description, category, quantity, price, name } = req.body || {};
     if (!description || !category || !quantity || !price || !images || !name) {
       throw new AppError("Make Sure You Added All The Data.", 400);
     }
