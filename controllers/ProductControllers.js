@@ -6,7 +6,7 @@ const AppError = require("../utils/AppError");
 const UploadImage = require("../middlerwares/Image_kit");
 exports.getAllProducts = async (req, res, next) => {
   try {
-    const products = await Products.find();
+    const products = await Products.find().populate("category" , "name _id");
     Response(res, 200, products);
   } catch (err) {
     next(err);
@@ -22,7 +22,7 @@ exports.getProductByName = async (req, res, next) => {
     const product = await Products.findOne({ name }).collation({
       locale: "en",
       strength: 2,
-    });
+    }).populate("category" , "name _id");
     if (!product) {
       throw new AppError("Product Not Found", 404);
     }
