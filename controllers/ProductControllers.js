@@ -6,23 +6,33 @@ const AppError = require("../utils/AppError");
 const UploadImage = require("../middlerwares/Image_kit");
 exports.getAllProducts = async (req, res, next) => {
   try {
-    const products = await Products.find().populate("category" , "name _id");
-    Response(res, 200, products);
+    const query = { ...req.query };
+    let queryStr = JSON.stringify(query);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (sm) => `$${sm}`);
+    const products = await Products.find(JSON.parse(queryStr))
+      .collation({
+        locale: "en",
+        strength: 3,
+      })
+      .populate("category", "name _id");
+
+    await Response(res, 200, products);
   } catch (err) {
     next(err);
   }
 };
 exports.getProductByName = async (req, res, next) => {
   try {
-    const { name } = req.params || {};
+    let { name } = req.params || {};
     if (!name) {
       throw new AppError("Please Provide The Name OF the Product.", 400);
     }
-    name.toLowerCase();
-    const product = await Products.findOne({ name }).collation({
-      locale: "en",
-      strength: 2,
-    }).populate("category" , "name _id");
+    const product = await Products.findOne({ name })
+      .collation({
+        locale: "en",
+        strength: 2,
+      })
+      .populate("category", "name _id");
     if (!product) {
       throw new AppError("Product Not Found", 404);
     }

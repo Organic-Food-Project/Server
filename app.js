@@ -12,6 +12,7 @@ const uri = process.env.MONGODB_URI.replace(
   "<db_password>",
   process.env.ATLAS_PASSWORD
 );
+app.set("query parser", "extended");
 app.use(express.json());
 app.use(morgan());
 app.use(

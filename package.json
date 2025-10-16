@@ -24,6 +24,8 @@
     "nodemon": "^3.1.10"
   },
   "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.7.1",
     "cross-env": "^10.0.0"
   }
 }
