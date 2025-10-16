@@ -6,14 +6,33 @@ const AppError = require("../utils/AppError");
 const UploadImage = require("../middlerwares/Image_kit");
 exports.getAllProducts = async (req, res, next) => {
   try {
-    const query = { ...req.query };
-    let queryStr = JSON.stringify(query);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (sm) => `$${sm}`);
-    const products = await Products.find(JSON.parse(queryStr))
-      .collation({
-        locale: "en",
-        strength: 3,
-      })
+    const query = req.query.filters || 0;
+    let Final = {};
+    console.log(query);
+    if (query) {
+      console.log("You made it!!");
+      const filters = query.split(",");
+      filters.forEach((el) => {
+        const [key, value] = el.split(":");
+        if (value.includes("-")) {
+          const [min, max] = value.split("-");
+          Final[key] = { $gte: Number(min), $lte: Number(max) };
+        }
+        if (value.includes("|")) {
+          const Cats = value.split("|");
+          Final[key] = { $in: Cats };
+        }
+      });
+    }
+    // const query = { ...req.query };
+    // let queryStr = JSON.stringify(query);
+    // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (sm) => `$${sm}`);
+    // console.log(Final);
+    const products = await Products.find(Final)
+      // .collation({
+      //   locale: "en",
+      //   strength: 3,
+      // })
       .populate("category", "name _id");
 
     await Response(res, 200, products);
