@@ -4,36 +4,22 @@ const Catogaries = require("../modles/categariesSchema");
 const Response = require("../middlerwares/Response");
 const AppError = require("../utils/AppError");
 const UploadImage = require("../middlerwares/Image_kit");
+const Categories = require("../modles/categariesSchema");
 exports.getAllProducts = async (req, res, next) => {
   try {
-    const query = req.query.filters || 0;
+    const query = req.query.filter || 0;
     let Final = {};
-    console.log(query);
+
     if (query) {
-      console.log("You made it!!");
-      const filters = query.split(",");
-      filters.forEach((el) => {
-        const [key, value] = el.split(":");
-        if (value.includes("-")) {
-          const [min, max] = value.split("-");
-          Final[key] = { $gte: Number(min), $lte: Number(max) };
-        }
-        if (value.includes("|")) {
-          const Cats = value.split("|");
-          Final[key] = { $in: Cats };
-        }
-      });
+      Final["price"] = { $gte: query.min_price, $lte: query.max_price };
+      Final["category"] = { $in: query.category };
+      Final["rate"] = query.rate ? { $gte: query.rate } : { $gte: 0 };
     }
-    // const query = { ...req.query };
-    // let queryStr = JSON.stringify(query);
-    // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (sm) => `$${sm}`);
-    // console.log(Final);
-    const products = await Products.find(Final)
-      // .collation({
-      //   locale: "en",
-      //   strength: 3,
-      // })
-      .populate("category", "name _id");
+    console.log(query, Final);
+    const products = await Products.find(Final).populate(
+      "category",
+      "name _id"
+    );
 
     await Response(res, 200, products);
   } catch (err) {
@@ -129,6 +115,11 @@ exports.deleteProduct = async (req, res, next) => {
     if (!product) {
       throw new AppError("Product Not Found", 404);
     }
+    const cat = await Categories.findById({ _id: product.category });
+    cat.products = cat.products.filter(
+      (id) => id.toString() !== product._id.toString()
+    );
+    await cat.save();
     Response(res, 200, "Product Deleted Successfuly");
   } catch (err) {
     next(err);
