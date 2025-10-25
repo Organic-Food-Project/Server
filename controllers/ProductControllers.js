@@ -7,21 +7,39 @@ const UploadImage = require("../middlerwares/Image_kit");
 const Categories = require("../modles/categariesSchema");
 exports.getAllProducts = async (req, res, next) => {
   try {
-    const query = req.query.filter || 0;
     let Final = {};
-
-    if (query) {
-      Final["price"] = { $gte: query.min_price, $lte: query.max_price };
-      Final["category"] = { $in: query.category };
-      Final["rate"] = query.rate ? { $gte: query.rate } : { $gte: 0 };
+    // Filter
+    if (req.query.filter) {
+      const query = req.query.filter;
+      if (query.min_price && query.max_price) {
+        Final["price"] = { $gte: query.min_price, $lte: query.max_price };
+      }
+      if (query.category) {
+        Final["category"] = { $in: query.category };
+      }
+      if (query.rate) {
+        Final["rate"] = query.rate ? { $gte: query.rate } : { $gte: 0 };
+      }
+      console.log(query, Final);
     }
-    console.log(query, Final);
-    const products = await Products.find(Final).populate(
-      "category",
-      "name _id"
-    );
-
-    await Response(res, 200, products);
+    let products = Products.find(Final).populate("category", "name _id");
+    // Sort
+    if (req.query.sort) {
+      let sort = req.query.sort;
+      sort = sort.replaceAll(",", " ");
+      products = products.sort(sort);
+    } else {
+      products = products.sort("-createdAt");
+    }
+    // Limit Fields
+    if (req.query.limit) {
+      let limit = req.query.limit.split(",").join(" ");
+      products = products.select(limit);
+    } else {
+      products = products.select("-__v");
+    }
+    const finish = await products;
+    await Response(res, 200, finish);
   } catch (err) {
     next(err);
   }
@@ -71,7 +89,7 @@ exports.addNewProduct = async (req, res, next) => {
     const catsname = cat.name;
     const product = await Products.create({
       description,
-      category: catsname,
+      category,
       images,
       quantity,
       price,
@@ -91,12 +109,12 @@ exports.updateProduct = async (req, res, next) => {
     if (!user || user.role !== "admin") {
       throw new AppError("You Are Not Allowed To Do This.", 403);
     }
-    const { name } = req.body;
-    const product = Products.findOneAndUpdate({ name });
+    const { id } = req.params;
+    const product = await Products.findByIdAndUpdate({ _id: id }, req.body);
     if (!product) {
       throw new AppError("Product Not Found", 404);
     }
-    Response(res, 201, "Product Edited Succesfuly");
+    Response(res, 200, product);
   } catch (err) {
     next(err);
   }
