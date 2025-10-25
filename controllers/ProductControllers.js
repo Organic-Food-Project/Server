@@ -8,6 +8,7 @@ const Categories = require("../modles/categariesSchema");
 exports.getAllProducts = async (req, res, next) => {
   try {
     let Final = {};
+    const productCount = await Products.countDocuments();
     // Filter
     if (req.query.filter) {
       const query = req.query.filter;
@@ -45,7 +46,6 @@ exports.getAllProducts = async (req, res, next) => {
     products = products.skip(skip).limit(limit);
 
     if (req.query.page) {
-      const productCount = await Products.countDocuments();
       if (skip >= productCount) {
         throw new AppError("Products Not Found", 404);
       }
@@ -55,7 +55,7 @@ exports.getAllProducts = async (req, res, next) => {
       data: finish,
       meta: {
         limit,
-        total: finish.length,
+        total: productCount,
       },
     });
   } catch (err) {
