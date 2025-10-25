@@ -20,7 +20,6 @@ exports.getAllProducts = async (req, res, next) => {
       if (query.rate) {
         Final["rate"] = query.rate ? { $gte: query.rate } : { $gte: 0 };
       }
-      console.log(query, Final);
     }
     let products = Products.find(Final).populate("category", "name _id");
     // Sort
@@ -32,14 +31,33 @@ exports.getAllProducts = async (req, res, next) => {
       products = products.sort("-createdAt");
     }
     // Limit Fields
-    if (req.query.limit) {
-      let limit = req.query.limit.split(",").join(" ");
-      products = products.select(limit);
+    if (req.query.fields) {
+      let fields = req.query.fields.split(",").join(" ");
+      products = products.select(fields);
     } else {
       products = products.select("-__v");
     }
+    //Pagination
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 1;
+    const skip = (page - 1) * limit;
+
+    products = products.skip(skip).limit(limit);
+
+    if (req.query.page) {
+      const productCount = await Products.countDocuments();
+      if (skip >= productCount) {
+        throw new AppError("Products Not Found", 404);
+      }
+    }
     const finish = await products;
-    await Response(res, 200, finish);
+    res.status(200).json({
+      data: finish,
+      meta: {
+        limit,
+        total: finish.length,
+      },
+    });
   } catch (err) {
     next(err);
   }

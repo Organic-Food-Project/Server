@@ -27,6 +27,7 @@ const ImageValidate = (isProduct) => {
         ) {
           continue;
         } else {
+          console.log(mime, ext);
           return next(new AppError("Only Image File Types are allowed", 400));
         }
       }
