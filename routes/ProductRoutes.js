@@ -15,5 +15,6 @@ Router.post(
   Products.addNewProduct
 );
 Router.delete("/:id", auth.protect, Products.deleteProduct);
+Router.patch("/:id", auth.protect, Products.updateProduct);
 
 module.exports = Router;

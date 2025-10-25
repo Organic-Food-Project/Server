@@ -8,7 +8,6 @@ const Categories = require("../modles/categariesSchema");
 exports.getAllProducts = async (req, res, next) => {
   try {
     let Final = {};
-    const productCount = await Products.countDocuments();
     // Filter
     if (req.query.filter) {
       const query = req.query.filter;
@@ -40,7 +39,7 @@ exports.getAllProducts = async (req, res, next) => {
     }
     //Pagination
     const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 1;
+    const limit = req.query.limit * 1 || 10;
     const skip = (page - 1) * limit;
 
     products = products.skip(skip).limit(limit);
@@ -55,7 +54,7 @@ exports.getAllProducts = async (req, res, next) => {
       data: finish,
       meta: {
         limit,
-        total: productCount,
+        total: finish.length,
       },
     });
   } catch (err) {
