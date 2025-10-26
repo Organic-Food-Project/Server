@@ -1,11 +1,6 @@
-const Response = async (res, statusCode, info, length) => {
+const Response = async (res, statusCode, info) => {
   res.status(statusCode).json({
-    results: length,
     data: info,
-    meta: {
-      limit: 15,
-      total: 100,
-    },
   });
 };
 

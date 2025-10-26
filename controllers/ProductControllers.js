@@ -45,6 +45,7 @@ exports.getAllProducts = async (req, res, next) => {
     products = products.skip(skip).limit(limit);
 
     if (req.query.page) {
+      let productCount = await Products.countDocuments();
       if (skip >= productCount) {
         throw new AppError("Products Not Found", 404);
       }
