@@ -1,4 +1,4 @@
-const Response = async (res, statusCode, info) => {
+const Response = (res, statusCode, info) => {
   res.status(statusCode).json({
     data: info,
   });
