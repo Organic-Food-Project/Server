@@ -20,7 +20,8 @@ const userSchema = mongoose.Schema(
       enum: ["admin", "user"],
       default: "user",
     },
-    Cart: { required: false, type: Array, default: [] },
+    Cart: { type: Array, default: [] },
+    WishList: { type: Array, default: [] },
   },
   { timestamps: true }
 );
