@@ -1,3 +1,6 @@
 .env
 node_modules
 images
+*.html
+Testing.js
+What_needs_To_Be_Done.txt
