@@ -34,7 +34,7 @@ exports.GetWishList = async (req, res, next) => {
         .status(200)
         .json({ status: "success", data: wishlist, meta: { limit, total } });
     }
-    return Response(res, 400, []);
+    return Response(res, 200, []);
   } catch (err) {
     next(err);
   }
