@@ -6,5 +6,5 @@ const auth = require("../controllers/authControllers");
 Router.post("/", auth.protect, controler.AddToCart);
 Router.patch("/", auth.protect, controler.UpdateCart);
 Router.delete("/", auth.protect, controler.DeleteFromCart);
-// WishList
+Router.get("/", auth.protect, controler.Getcart);
 module.exports = Router;

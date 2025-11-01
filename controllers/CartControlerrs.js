@@ -4,13 +4,37 @@ const file = require("../modles/porductSchema");
 const Products = file.Products;
 const AppError = require("../utils/AppError");
 
+exports.Getcart = async (req, res, next) => {
+  // name price images quantity
+  const user = req.user;
+  if (!user) {
+    throw new AppError("Make Sure You LogIn", 404);
+  }
+  if (req.user.Cart) {
+    const cart = await Promise.all(
+      req.user.Cart.map(async (el) => {
+        const product = await Products.findById(el.productID).select(
+          "name images price"
+        );
+        return {
+          name: product.name,
+          price: product.price,
+          images: product.images,
+          quantity: el.quantity,
+        };
+      })
+    );
+    return Response(res, 200, cart);
+  }
+  return Response(res, 400, "Cart is Empty");
+};
 exports.AddToCart = async (req, res, next) => {
   try {
     const user = req.user;
     if (!user) {
       throw new AppError("Make Sure You LogIn", 404);
     }
-    const { productID, number } = req.body;
+    const { productID, number } = req.body || {};
     const product = await Products.findById(productID);
     if (!productID || !number) {
       throw new AppError("Please Provide the productID and the number", 400);
