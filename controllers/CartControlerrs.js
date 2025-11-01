@@ -18,7 +18,7 @@ exports.Getcart = async (req, res, next) => {
             "_id name images price"
           );
           return {
-            id: product._id,
+            _id: product._id,
             name: product.name,
             price: product.price,
             images: product.images,
@@ -26,6 +26,7 @@ exports.Getcart = async (req, res, next) => {
           };
         })
       );
+      console.log(req.headers);
       return Response(res, 200, cart);
     }
     return Response(res, 400, "Cart is Empty");
