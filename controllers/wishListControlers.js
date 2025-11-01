@@ -1,9 +1,37 @@
-const { not } = require("joi");
 const Response = require("../middlerwares/Response");
 const file = require("../modles/porductSchema");
 const Products = file.Products;
 const AppError = require("../utils/AppError");
 
+exports.GetWishList = async (req, res, next) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      throw new AppError("Please Make Sure LogIn", 403);
+    }
+    console.log(user.WishList.length);
+    if (user.WishList.length > 0) {
+      const wishlist = await Promise.all(
+        user.WishList.map(async (element) => {
+          const product = await Products.findById(element).select(
+            "_id name price quantity images"
+          );
+          return {
+            id: product._id,
+            name: product.name,
+            price: product.price,
+            images: product.images,
+            quantity: product.quantity,
+          };
+        })
+      );
+      return Response(res, 200, wishlist);
+    }
+    return Response(res, 400, "WishList is empty Add Something First");
+  } catch (err) {
+    next(err);
+  }
+};
 exports.addToWishList = async (req, res, next) => {
   try {
     const user = req.user;

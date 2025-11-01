@@ -4,6 +4,7 @@ const Router = express.Router();
 const auth = require("../controllers/authControllers");
 const WishList = require("../controllers/wishListControlers");
 
+Router.get("/", auth.protect, WishList.GetWishList);
 Router.post("/", auth.protect, WishList.addToWishList);
 Router.delete("/", auth.protect, WishList.deleteFromWishList);
 

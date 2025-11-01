@@ -15,9 +15,10 @@ exports.Getcart = async (req, res, next) => {
       const cart = await Promise.all(
         req.user.Cart.map(async (el) => {
           const product = await Products.findById(el.productID).select(
-            "name images price"
+            "_id name images price"
           );
           return {
+            id: product._id,
             name: product.name,
             price: product.price,
             images: product.images,
