@@ -9,15 +9,17 @@ exports.GetWishList = async (req, res, next) => {
     if (!user) {
       throw new AppError("Please Make Sure LogIn", 403);
     }
-    console.log(user.WishList.length);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
     if (user.WishList.length > 0) {
-      const wishlist = await Promise.all(
+      let wishlist = await Promise.all(
         user.WishList.map(async (element) => {
           const product = await Products.findById(element).select(
             "_id name price quantity images"
           );
           return {
-            id: product._id,
+            _id: product._id,
             name: product.name,
             price: product.price,
             images: product.images,
@@ -26,9 +28,13 @@ exports.GetWishList = async (req, res, next) => {
         })
       );
       console.log(req.headers);
-      return Response(res, 200, wishlist);
+      const total = wishlist.length;
+      wishlist = wishlist.slice(skip, skip + limit);
+      return res
+        .status(200)
+        .json({ status: "success", data: wishlist, meta: { limit, total } });
     }
-    return Response(res, 400, "WishList is empty Add Something First");
+    return Response(res, 400, []);
   } catch (err) {
     next(err);
   }
