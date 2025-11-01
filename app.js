@@ -6,6 +6,7 @@ const ProductRouter = require("./routes/ProductRoutes");
 const CartRouter = require("./routes/CartRoutees");
 const CategoryRouter = require("./routes/CategoryRoutes");
 const WishListRouter = require("./routes/WishListRoutes");
+const CheckoutRouter = require("./routes/CheckoutRoutes");
 const mongoose = require("mongoose");
 const connectDB = require("./Mongodb");
 const cors = require("cors");
@@ -21,6 +22,8 @@ app.use(
   cors({
     origin: ["http:localhost:3000", `${process.env.FrontEnd}`],
     credentials: true,
+    allowedHeaders: ["Authorization", "Content-Type"],
+    methods: ["GET", "POST", "PUT", "OPTIONS", "DELETE"],
   })
 );
 app.use("/api/v1/users", UserRouter);
@@ -28,6 +31,7 @@ app.use("/api/v1/products", ProductRouter);
 app.use("/api/v1/categories", CategoryRouter);
 app.use("/api/v1/cart", CartRouter);
 app.use("/api/v1/wishlist", WishListRouter);
+app.use("/api/v1/checkout", CheckoutRouter);
 
 app.get("/", (req, res) => {
   res.send("Server Running");
