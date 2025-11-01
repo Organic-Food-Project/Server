@@ -25,6 +25,7 @@ exports.GetWishList = async (req, res, next) => {
           };
         })
       );
+      console.log(req.headers);
       return Response(res, 200, wishlist);
     }
     return Response(res, 400, "WishList is empty Add Something First");
