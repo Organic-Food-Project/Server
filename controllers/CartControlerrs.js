@@ -15,7 +15,7 @@ exports.Getcart = async (req, res, next) => {
       const cart = await Promise.all(
         req.user.Cart.map(async (el) => {
           const product = await Products.findById(el.productID).select(
-            "_id name images price"
+            "_id name images price quantity"
           );
           return {
             _id: product._id,
@@ -23,6 +23,7 @@ exports.Getcart = async (req, res, next) => {
             price: product.price,
             images: product.images,
             quantity: el.quantity,
+            product_quantity: product.quantity,
           };
         })
       );
@@ -57,7 +58,16 @@ exports.AddToCart = async (req, res, next) => {
     }
     const check = user.Cart.find((el) => el.productID === productID);
     if (check) {
-      throw new AppError("This Product already In Your Cart", 400);
+      if (check.quantity + quantity > product.quantity) {
+        throw new AppError(
+          `We Don't have That Many Of this Product (${product.name})`,
+          400
+        );
+      }
+      check.quantity += quantity;
+      user.markModified("Cart");
+      await user.save();
+      return Response(res, 201, user.Cart);
     }
     user.Cart.push({
       productID,

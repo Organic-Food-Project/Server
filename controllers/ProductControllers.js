@@ -5,6 +5,8 @@ const Response = require("../middlerwares/Response");
 const AppError = require("../utils/AppError");
 const UploadImage = require("../middlerwares/Image_kit");
 const Categories = require("../modles/categariesSchema");
+const inWsihlist = require("../middlerwares/inWishlist");
+const auth = require("./authControllers");
 exports.getAllProducts = async (req, res, next) => {
   try {
     let Final = {};
@@ -22,6 +24,7 @@ exports.getAllProducts = async (req, res, next) => {
       }
     }
     let products = Products.find(Final).populate("category", "name _id");
+    const total = await Products.countDocuments(Final);
     // Sort
     if (req.query.sort) {
       let sort = req.query.sort;
@@ -50,12 +53,25 @@ exports.getAllProducts = async (req, res, next) => {
         throw new AppError("Products Not Found", 404);
       }
     }
-    const finish = await products;
+    let finish = await products.lean();
+    //
+    const header = await req.get("Authorization");
+    if (header) {
+      await auth.protect(req, res, next);
+      const WishListIDs = req.user.WishList.map((el) => el.toString());
+      finish = finish.map((el) => ({
+        ...el,
+        inWishlist: WishListIDs.includes(el._id.toString()),
+      }));
+    } else {
+      finish = finish.map((el) => ({ ...el, inWishlist: false }));
+    }
+    //
     res.status(200).json({
       data: finish,
       meta: {
         limit,
-        total: finish.length,
+        total,
       },
     });
   } catch (err) {

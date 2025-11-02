@@ -4,8 +4,19 @@ const AppError = require("../utils/AppError");
 const UploadImage = require("../middlerwares/Image_kit");
 exports.getallCategories = async (req, res, next) => {
   try {
-    const categories = await Categories.find();
-    Response(res, 200, categories);
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 1;
+    const skip = (page - 1) * limit;
+    const total = await Categories.countDocuments();
+    const categories = await Categories.find().skip(skip).limit(limit);
+
+    res.status(200).json({
+      data: categories,
+      meta: {
+        limit,
+        total,
+      },
+    });
   } catch (err) {
     console.error(err);
   }
@@ -16,8 +27,8 @@ exports.addCategory = async (req, res, next) => {
     if (!user || user.role !== "admin") {
       throw new AppError("You Are Not Allowed To Do This.", 403);
     }
-    const image = await UploadImage(req)
-    const { name, count} = req.body || {};
+    const image = await UploadImage(req);
+    const { name, count } = req.body || {};
     if (!name || count || !image) {
       throw new AppError(
         "Please Provide (name & count = 0 & image) for the category",
@@ -48,7 +59,7 @@ exports.deleteCategory = async (req, res, next) => {
     if (!id) {
       throw new AppError("Provide What You Want To Delete", 400);
     }
-    const cat = await Categories.findOneAndDelete({ _id:id });
+    const cat = await Categories.findOneAndDelete({ _id: id });
     if (!cat) {
       throw new AppError("Category Not Found", 404);
     }
