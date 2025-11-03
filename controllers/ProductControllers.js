@@ -84,14 +84,29 @@ exports.getProductByName = async (req, res, next) => {
     if (!name) {
       throw new AppError("Please Provide The Name OF the Product.", 400);
     }
-    const product = await Products.findOne({ name })
+    let product = await Products.findOne({ name })
       .collation({
         locale: "en",
         strength: 2,
       })
-      .populate("category", "name _id");
+      .populate("category", "name _id")
+      .lean();
     if (!product) {
       throw new AppError("Product Not Found", 404);
+    }
+    const header = await req.get("Authorization");
+    if (header) {
+      await auth.protect(req, res, next);
+      const WishListIDs = req.user.WishList.map((el) => el.toString());
+      product = {
+        ...product,
+        inWishlist: WishListIDs.includes(product._id.toString()),
+      };
+    } else {
+      product = {
+        ...product,
+        inWishlist: false,
+      };
     }
     Response(res, 200, product);
   } catch (err) {
