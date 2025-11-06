@@ -90,13 +90,6 @@ exports.deleteUser = async (req, res, next) => {
   }
 };
 
-exports.comment = async (req, res, next) => {
-  try {
-  } catch (err) {
-    next(err);
-  }
-};
-
 exports.AdminDeleteUser = async (req, res, next) => {
   try {
     const user = req.user;

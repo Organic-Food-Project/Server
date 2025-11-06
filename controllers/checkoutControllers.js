@@ -29,9 +29,6 @@ exports.checkout = async (req, res, next) => {
     const products_data = cart.map((el) => {
       return { id: el.product_id, quantity: Number(el.quantity) };
     });
-    // const success_products = req.user.Cart.map((el) => {
-    //   return el.productID;
-    // }).join(",");
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       success_url: `https://organicfood-client.vercel.app/`,
@@ -41,7 +38,7 @@ exports.checkout = async (req, res, next) => {
       mode: "payment",
       metadata: { products_data: JSON.stringify(products_data) },
     });
-    return Response(res, 200, session.url);
+    return Response(res, 200, session.id);
   } catch (err) {
     next(err);
   }
@@ -52,16 +49,15 @@ const AddPayment = async (session) => {
     "_id"
   );
   const product_data = JSON.parse(session.metadata.products_data);
-  // const editing = session.metadata.products_quantity;
-  // const products = session.metadata.success_products.split(",");
-  await Payment.create({
+  const payment = await Payment.create({
     products: product_data.map((el) => {
       return el.id;
     }),
     user: user._id,
     price: session.amount_total / 100,
   });
-  // editing the products so by minimizing the quantity
+  user.purchase_history.push(payment._id);
+  await user.save();
   for (const i of product_data) {
     const product = await Products.findById(i.id);
     if (product) {
@@ -92,20 +88,3 @@ exports.Webhook_checkout = async (req, res, next) => {
 
   res.status(200).json({ recieved: true });
 };
-
-// exports.AddPayment = async (req, res, next) => {
-//   try {
-//     if (!req.user && !req.query.products && !req.query.amount_total) {
-//       next();
-//     }
-//     console.log(req.user, req.query.products, req.query.amount_total);
-//     await Payment.create({
-//       prodcts: [req.query.products.split(",")],
-//       user: req.user._id,
-//       price: req.query.amount_total,
-//     });
-//     next();
-//   } catch (err) {
-//     next(err);
-//   }
-// };

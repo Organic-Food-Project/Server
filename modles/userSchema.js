@@ -13,7 +13,7 @@ const userSchema = mongoose.Schema(
     Phone_Number: { type: String, default: "" },
     password: { type: String, required: [true, "Password is Required."] },
     Profile_Image_URL: { type: String, default: "" },
-    purchase_history: { type: Array, default: "" },
+    purchase_history: { type: Array, default: [] },
     role: {
       type: String,
       required: true,
