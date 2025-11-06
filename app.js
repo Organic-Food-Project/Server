@@ -6,7 +6,8 @@ const ProductRouter = require("./routes/ProductRoutes");
 const CartRouter = require("./routes/CartRoutees");
 const CategoryRouter = require("./routes/CategoryRoutes");
 const WishListRouter = require("./routes/WishListRoutes");
-const mongoose = require("mongoose");
+const CheckoutRouter = require("./routes/CheckoutRoutes");
+const checkoutController = require("./controllers/checkoutControllers");
 const connectDB = require("./Mongodb");
 const cors = require("cors");
 const morgan = require("morgan");
@@ -14,6 +15,13 @@ const uri = process.env.MONGODB_URI.replace(
   "<db_password>",
   process.env.ATLAS_PASSWORD
 );
+
+app.post(
+  "/webhook-checkout",
+  express.raw({ type: "application/json" }),
+  checkoutController.Webhook_checkout
+);
+
 app.set("query parser", "extended");
 app.use(express.json());
 app.use(morgan());
@@ -30,6 +38,7 @@ app.use("/api/v1/products", ProductRouter);
 app.use("/api/v1/categories", CategoryRouter);
 app.use("/api/v1/cart", CartRouter);
 app.use("/api/v1/wishlist", WishListRouter);
+app.use("/api/v1/checkout", CheckoutRouter);
 app.get("/", (req, res) => {
   res.send("Server Running");
 });
