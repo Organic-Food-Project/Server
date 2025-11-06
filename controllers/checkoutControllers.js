@@ -6,6 +6,9 @@ const Response = require("../middlerwares/Response");
 const User = require("../modles/userSchema");
 exports.checkout = async (req, res, next) => {
   try {
+    if (req.user.Cart.length <= 0) {
+      return Response(res, 400, "Your cart is empty.");
+    }
     const cart = await Promise.all(
       req.user.Cart.map(async (el) => {
         const product = await Products.findById(el.productID).select(
@@ -22,12 +25,14 @@ exports.checkout = async (req, res, next) => {
             },
           },
           quantity: el.quantity,
-          product_id: product._id,
         };
       })
     );
-    const products_data = cart.map((el) => {
-      return { id: el.product_id, quantity: Number(el.quantity) };
+    const products_data = req.user.Cart.map((el) => {
+      return {
+        id: el.productID.toString(),
+        quantity: Number(el.quantity),
+      };
     });
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -38,7 +43,7 @@ exports.checkout = async (req, res, next) => {
       mode: "payment",
       metadata: { products_data: JSON.stringify(products_data) },
     });
-    return Response(res, 200, session.id);
+    return Response(res, 200, session.url);
   } catch (err) {
     next(err);
   }
@@ -56,8 +61,6 @@ const AddPayment = async (session) => {
     user: user._id,
     price: session.amount_total / 100,
   });
-  user.purchase_history.push(payment._id);
-  await user.save();
   for (const i of product_data) {
     const product = await Products.findById(i.id);
     if (product) {
@@ -65,6 +68,8 @@ const AddPayment = async (session) => {
       await product.save();
     }
   }
+  user.purchase_history.push(payment._id);
+  await user.save();
 };
 
 exports.Webhook_checkout = async (req, res, next) => {
