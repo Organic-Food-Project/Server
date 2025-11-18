@@ -42,7 +42,7 @@ exports.login = async (req, res, next) => {
     next(err);
   }
 };
-exports.protect = async (req, res, next) => {
+exports.protect = async (req, res, next, options = {}) => {
   try {
     const header = await req.get("Authorization");
     if (!header) {
@@ -58,8 +58,12 @@ exports.protect = async (req, res, next) => {
     }
     const user = await User.findOne({ email: confirm.email });
     req.user = user;
-    next();
+    return next();
   } catch (err) {
+    if (options.soft && err.name === "TokenExpiredError") {
+      req.user = null;
+      return next();
+    }
     next(err);
   }
 };

@@ -57,12 +57,16 @@ exports.getAllProducts = async (req, res, next) => {
     //
     const header = await req.get("Authorization");
     if (header) {
-      await auth.protect(req, res, next);
-      const WishListIDs = req.user.WishList.map((el) => el.toString());
-      finish = finish.map((el) => ({
-        ...el,
-        inWishlist: WishListIDs.includes(el._id.toString()),
-      }));
+      await auth.protect(req, res, next, { soft: true });
+      if (req.user) {
+        const WishListIDs = req.user.WishList.map((el) => el.toString());
+        finish = finish.map((el) => ({
+          ...el,
+          inWishlist: WishListIDs.includes(el._id.toString()),
+        }));
+      } else {
+        finish = finish.map((el) => ({ ...el, inWishlist: false }));
+      }
     } else {
       finish = finish.map((el) => ({ ...el, inWishlist: false }));
     }
