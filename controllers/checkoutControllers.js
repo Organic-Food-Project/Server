@@ -51,7 +51,7 @@ exports.checkout = async (req, res, next) => {
 
 const AddPayment = async (session) => {
   const user = await User.findOne({ email: session.customer_email }).select(
-    "_id"
+    "_id purchase_history Cart"
   );
   const product_data = JSON.parse(session.metadata.products_data);
   const payment = await Payment.create({
@@ -69,6 +69,7 @@ const AddPayment = async (session) => {
     }
   }
   user.purchase_history.push(payment._id);
+  user.Cart = [];
   await user.save();
 };
 
