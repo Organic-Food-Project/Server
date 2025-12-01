@@ -23,6 +23,11 @@ exports.getAllProducts = async (req, res, next) => {
         Final["rate"] = query.rate ? { $gte: query.rate } : { $gte: 0 };
       }
     }
+    //Search
+    if (req.query.search) {
+      let search = req.query.search;
+      Final["name"] = { $regex: search, $options: "i" };
+    }
     let products = Products.find(Final).populate("category", "name _id");
     const total = await Products.countDocuments(Final);
     // Sort
