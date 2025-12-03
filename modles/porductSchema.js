@@ -1,12 +1,4 @@
 const mongoose = require("mongoose");
-const commentsSchema = mongoose.Schema(
-  {
-    userName: { type: String, required: true },
-    comment: { type: String, required: true },
-    rate: { type: Number, default: 1 },
-  },
-  { timestamps: true }
-);
 const ProductSchema = mongoose.Schema(
   {
     name: { type: String, required: true, unique: true },
@@ -47,4 +39,3 @@ const ProductSchema = mongoose.Schema(
 );
 
 exports.Products = mongoose.model("Product", ProductSchema);
-exports.Comments = mongoose.model("Comment", commentsSchema);

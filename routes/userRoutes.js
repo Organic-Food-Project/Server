@@ -7,6 +7,7 @@ const user = require("../controllers/UserControlers");
 const validate = require("../middlerwares/validate");
 const ImageValidate = require("../middlerwares/Image_Validate");
 const upload = require("../middlerwares/multer");
+const comment = require("../controllers/revirew");
 
 Router.get("/", auth.protect, user.getUser);
 Router.get("/allusers", auth.protect, user.getallusers);
@@ -27,4 +28,5 @@ Router.put(
   user.UpdateImage
 );
 //
+Router.post("/review", auth.protect, comment.review);
 module.exports = Router;
