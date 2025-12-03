@@ -7,6 +7,7 @@ const ProductRouter = require("./routes/ProductRoutes");
 const CartRouter = require("./routes/CartRoutees");
 const CategoryRouter = require("./routes/CategoryRoutes");
 const WishListRouter = require("./routes/WishListRoutes");
+const ReviewRouter = require("./routes/reviewRoutes");
 const CheckoutRouter = require("./routes/CheckoutRoutes");
 const checkoutController = require("./controllers/checkoutControllers");
 const connectDB = require("./Mongodb");
@@ -41,6 +42,7 @@ app.use("/api/v1/categories", CategoryRouter);
 app.use("/api/v1/cart", CartRouter);
 app.use("/api/v1/wishlist", WishListRouter);
 app.use("/api/v1/checkout", CheckoutRouter);
+app.use("/api/v1/review", ReviewRouter);
 app.get("/", (req, res) => {
   res.send("Server Running");
 });

@@ -25,7 +25,6 @@ const ProductSchema = mongoose.Schema(
         "Bread & Bakery",
       ],
     },
-    feddBack: { type: [commentsSchema], default: [] },
     description: {
       type: String,
       required: true,
