@@ -10,6 +10,7 @@ const upload = require("../middlerwares/multer");
 
 Router.get("/", auth.protect, user.getUser);
 Router.get("/allusers", auth.protect, user.getallusers);
+Router.get("/orderhistory", auth.protect, user.orderHistory);
 //
 Router.post("/signup", validate(schemas.SignUpSchema), auth.signup);
 Router.post("/login", validate(schemas.loginSchema), auth.login);
@@ -18,7 +19,12 @@ Router.delete("/admindelete", auth.protect, user.AdminDeleteUser);
 Router.delete("/delete", auth.protect, user.deleteUser);
 //
 Router.put("/updatepassword", auth.protect, user.UpdatePassword);
-Router.put("/updateuser", auth.protect, user.updateuser);
+Router.put(
+  "/updateuser",
+  auth.protect,
+  validate(schemas.UpdateUserSchema),
+  user.updateuser
+);
 Router.put(
   "/updateImage",
   auth.protect,

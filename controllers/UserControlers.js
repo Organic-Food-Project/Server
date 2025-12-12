@@ -3,6 +3,7 @@ const AppError = require("../utils/AppError");
 const Response = require("../middlerwares/Response");
 const bcrypt = require("bcrypt");
 const UploadImage = require("../middlerwares/Image_kit");
+const Payment = require("../modles/paymentSchema");
 require("dotenv").config();
 exports.getallusers = async (req, res, next) => {
   try {
@@ -17,10 +18,6 @@ exports.getallusers = async (req, res, next) => {
   }
 };
 exports.getUser = async (req, res) => {
-  // const user = req.user.select(
-  //   "_id firstName lastName email Phone_Number Profile_Image_URL role createdAt updatedAt"
-  // );
-
   const allowedKeys = [
     "_id",
     "firstName",
@@ -42,12 +39,15 @@ exports.getUser = async (req, res) => {
 
 exports.updateuser = async (req, res, next) => {
   try {
-    const allowedFileds = ["firstName", "lastName", "email", "Phone_Number"];
+    const allowedFields = ["firstName", "lastName", "email", "Phone_Number"];
     let updates = {};
-    for (field of allowedFileds) {
+    for (const field of allowedFields) {
       if (req.body[field]) {
         updates[field] = req.body[field];
       }
+    }
+    if (Object.keys(updates).length === 0) {
+      throw new AppError("No Fields To Update.", 400);
     }
     const user = req.user;
 
@@ -57,8 +57,11 @@ exports.updateuser = async (req, res, next) => {
     const updatedUser = await User.findOneAndUpdate(
       { email: user.email },
       updates,
-      { new: true }
-    );
+      { new: true, runValidators: true, context: "query" }
+    ).select("firstName lastName email Phone_Number");
+    if (!updatedUser) {
+      throw new AppError("User Not Found.", 404);
+    }
     Response(res, 200, updatedUser);
   } catch (err) {
     next(err);
@@ -127,5 +130,20 @@ exports.AdminDeleteUser = async (req, res, next) => {
     Response(res, 200, "Target Deleted Successfuly.");
   } catch (err) {
     next(err);
+  }
+};
+
+exports.orderHistory = async (req, res, next) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      throw new AppError("sign in again");
+    }
+    const orders = await Payment.find({
+      _id: { $in: req.user.purchase_history },
+    });
+    Response(res, 200, orders);
+  } catch (error) {
+    next(error);
   }
 };
