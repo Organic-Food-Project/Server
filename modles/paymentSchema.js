@@ -22,7 +22,10 @@ const PaymentSchema = mongoose.Schema(
   { timestamps: true }
 );
 PaymentSchema.pre(/^find/, function () {
-  this.populate("user").populate("products");
+  this.populate({
+    path: "user",
+    select: "_id firstName lastName email",
+  }).populate({ path: "products", select: "_id name price rate description" });
 });
 const Payment = mongoose.model("payment", PaymentSchema);
 
