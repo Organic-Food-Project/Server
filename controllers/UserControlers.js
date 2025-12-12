@@ -17,7 +17,27 @@ exports.getallusers = async (req, res, next) => {
   }
 };
 exports.getUser = async (req, res) => {
-  Response(res, 200, req.user);
+  // const user = req.user.select(
+  //   "_id firstName lastName email Phone_Number Profile_Image_URL role createdAt updatedAt"
+  // );
+
+  const allowedKeys = [
+    "_id",
+    "firstName",
+    "lastName",
+    "email",
+    "Phone_Number",
+    "Profile_Image_URL",
+    "role",
+    "createdAt",
+    "updatedAt",
+  ];
+  const user = Object.fromEntries(
+    Object.entries(req.user.toObject()).filter(([key]) =>
+      allowedKeys.includes(key)
+    )
+  );
+  Response(res, 200, user);
 };
 
 exports.updateuser = async (req, res, next) => {
