@@ -7,10 +7,12 @@ const user = require("../controllers/UserControlers");
 const validate = require("../middlerwares/validate");
 const ImageValidate = require("../middlerwares/Image_Validate");
 const upload = require("../middlerwares/multer");
+const order = require("../controllers/OrderHistory");
 
 Router.get("/", auth.protect, user.getUser);
 Router.get("/allusers", auth.protect, user.getallusers);
-Router.get("/orderhistory", auth.protect, user.orderHistory);
+Router.get("/orderhistory", auth.protect, order.orderHistory);
+Router.get("/:orderid", auth.protect, order.getOrderById);
 //
 Router.post("/signup", validate(schemas.SignUpSchema), auth.signup);
 Router.post("/login", validate(schemas.loginSchema), auth.login);
