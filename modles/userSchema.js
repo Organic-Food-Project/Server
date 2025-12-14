@@ -3,8 +3,16 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 const userSchema = mongoose.Schema(
   {
-    firstName: { type: String, default: "" },
-    lastName: { type: String, default: "" },
+    firstName: {
+      type: String,
+      default: "",
+      required: [true, "firstName is Required."],
+    },
+    lastName: {
+      type: String,
+      default: "",
+      required: [true, "lastName is Required."],
+    },
     email: {
       type: String,
       required: [true, "Email is Required."],

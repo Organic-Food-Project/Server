@@ -3,7 +3,6 @@ const AppError = require("../utils/AppError");
 const Response = require("../middlerwares/Response");
 const bcrypt = require("bcrypt");
 const UploadImage = require("../middlerwares/Image_kit");
-const Payment = require("../modles/paymentSchema");
 require("dotenv").config();
 exports.getallusers = async (req, res, next) => {
   try {
@@ -130,45 +129,5 @@ exports.AdminDeleteUser = async (req, res, next) => {
     Response(res, 200, "Target Deleted Successfuly.");
   } catch (err) {
     next(err);
-  }
-};
-
-exports.orderHistory = async (req, res, next) => {
-  try {
-    const user = req.user;
-    if (!user) {
-      throw new AppError("sign in again");
-    }
-    const limit = req.query.limit * 1 || 1;
-    const page = req.query.page * 1 || 1;
-    const skip = (page - 1) * limit;
-    let orders = Payment.find(
-      {
-        _id: { $in: req.user.purchase_history },
-      },
-      "_id createdAt total"
-    );
-    orders.skip(skip).limit(limit);
-    if (req.query.page) {
-      if (skip >= req.user.purchase_history.length) {
-        res.status(200).json({
-          data: [],
-          meta: {
-            limit,
-            total: req.user.purchase_history.length,
-          },
-        });
-      }
-    }
-    orders = await orders.lean();
-    res.status(200).json({
-      data: orders,
-      meta: {
-        limit,
-        total: req.user.purchase_history.length,
-      },
-    });
-  } catch (error) {
-    next(error);
   }
 };

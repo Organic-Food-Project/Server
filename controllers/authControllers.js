@@ -5,7 +5,8 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 exports.signup = async (req, res, next) => {
   try {
-    const { email, password, confirmPassword } = req.body;
+    const { email, password, confirmPassword, firstName, lastName } =
+      req.body || {};
     const user = await User.findOne({ email });
     if (user) {
       throw new AppError("This Email Already Exists.", 409);
@@ -13,9 +14,17 @@ exports.signup = async (req, res, next) => {
     if (confirmPassword !== password) {
       throw new AppError("Make Sure Passwords Match!", 400);
     }
+    if (!email || !password || !confirmPassword || !firstName || !lastName) {
+      throw new AppError(
+        "email, password, confirmPassword, firstName and lastName are all required",
+        400
+      );
+    }
     const newUser = await User.create({
       email,
       password,
+      firstName,
+      lastName,
     });
     res.status(201).json({ message: "User Created!", newUser });
   } catch (err) {
