@@ -99,6 +99,7 @@ exports.getProductByName = async (req, res, next) => {
         strength: 2,
       })
       .populate("category", "name _id")
+      .populate("feedBack")
       .lean();
     if (!product) {
       throw new AppError("Product Not Found", 404);

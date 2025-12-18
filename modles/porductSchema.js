@@ -25,6 +25,7 @@ const ProductSchema = mongoose.Schema(
         "Bread & Bakery",
       ],
     },
+    feedBack: [{ type: mongoose.Schema.ObjectId, ref: "review" }],
     description: {
       type: String,
       required: true,

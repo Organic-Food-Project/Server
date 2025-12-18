@@ -1,25 +1,47 @@
 const AppError = require("../utils/AppError");
-const Review = require("../modles/reviewSchema");
+const Products = require("../modles/porductSchema").Products;
+const Review = require("../modles/reviewSchema").reviews;
+const Payment = require("../modles/paymentSchema");
 exports.Addreview = async (req, res, next) => {
-  const { comment, produtID, rating } = req.body || {};
-  if (!comment || !produtID || !rating) {
-    return next(
-      new AppError("Make sure to add comment , productID and rating.", 400)
-    );
+  try {
+    const { comment, prID, rating } = req.body || {};
+    if (!comment || !prID || !rating) {
+      return next(
+        new AppError("Make sure to add comment , prID and rating.", 400)
+      );
+    }
+    const user = req.user;
+    const orders = await Payment.find({ _id: { $in: user.purchase_history } });
+    if (!orders.length) {
+      throw new AppError(
+        "review is only allowed for those who bought something before",
+        401
+      );
+    }
+    const exists = orders.some((obj) => {
+      return obj.products.includes(prID);
+    });
+    if (!exists) {
+      return next(
+        new AppError("you can only review items you have purchased before", 400)
+      );
+    }
+    const product = await Products.findById(prID);
+    if (!product) {
+      throw new AppError("product Not Found", 404);
+    }
+    const rev = await Review.create({
+      userID: user._id,
+      productID: prID,
+      comment,
+      rate: rating,
+    });
+    product.feedBack.push(rev._id);
+    await product.save();
+    res.status(201).json({ status: "success", data: rev });
+  } catch (error) {
+    next(error);
   }
-  const user = req.user;
-  if (!user.purchase_history.includes(produtID)) {
-    return next(
-      new AppError("you can only review items you have purchased before", 400)
-    );
-  }
-  const rev = await Review.create({
-    userID: user._id,
-    produtID,
-    comment,
-    rate: rating,
-  });
-  res.status(201).json({ status: "success", data: rev });
 };
 
 exports.getAllReview = async (req, res, next) => {
@@ -36,15 +58,32 @@ exports.getAllReview = async (req, res, next) => {
   res.status(200).json({ status: "success", data: revs });
 };
 exports.deleteReview = async (req, res, next) => {
-  const { revID } = req.body || {};
-  if (!revID) {
-    return next(
-      new AppError("please provide the revID you want to delete", 400)
-    );
+  try {
+    const { revID } = req.body || {};
+    if (!revID) {
+      return next(
+        new AppError("please provide the revID you want to delete", 400)
+      );
+    }
+    const review = await Review.findById(revID);
+    if (!review) {
+      return next(
+        new AppError("review not found make sure ID is correct", 404)
+      );
+    }
+
+    if (req.user._id != review.userID && req.user.role != "admin") {
+      return next(
+        new AppError("you don't have permission to delete this one.", 403)
+      );
+    }
+
+    const deletedReview = await Review.findOneAndDelete({ _id: review._id });
+    if (!deletedReview) {
+      return next(new AppError("review not found", 404));
+    }
+    res.status(200).json({ data: "deleted successfuly" });
+  } catch (error) {
+    next(error);
   }
-  const deletedProduct = await Review.findOneAndDelete({ _id: revID });
-  if (!deletedProduct) {
-    return next(new AppError("review not found make sure ID is correct", 404));
-  }
-  res.status(200).json({ data: "deleted successfuly" });
 };
