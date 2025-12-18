@@ -8,6 +8,7 @@ const CartRouter = require("./routes/CartRoutees");
 const CategoryRouter = require("./routes/CategoryRoutes");
 const ContactUsRouter = require("./routes/contactRoutes");
 const WishListRouter = require("./routes/WishListRoutes");
+const analyticsRouter = require("./routes/AnalyticsRoutes");
 const ReviewRouter = require("./routes/reviewRoutes");
 const CheckoutRouter = require("./routes/CheckoutRoutes");
 const checkoutController = require("./controllers/checkoutControllers");
@@ -38,6 +39,7 @@ app.use(
   })
 );
 app.use("/api/v1/users", UserRouter);
+app.use("/api/v1/analytics", analyticsRouter);
 app.use("/api/v1/products", ProductRouter);
 app.use("/api/v1/categories", CategoryRouter);
 app.use("/api/v1/cart", CartRouter);
