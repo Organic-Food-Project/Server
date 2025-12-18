@@ -92,12 +92,17 @@ exports.UpdatePassword = async (req, res, next) => {
   }
 };
 exports.UpdateImage = async (req, res, next) => {
-  const images = await UploadImage(req);
-  const user = req.user;
-  if (!images) {
-    throw new AppError("Please Provide Profile Image", 400);
+  try {
+    const images = await UploadImage(req);
+    const user = req.user;
+    if (!images) {
+      throw new AppError("Please Provide Profile Image", 400);
+    }
+    user.Profile_Image_URL = images;
+    Response(res, 200, "Image Edited Successfully");
+  } catch (error) {
+    next(error);
   }
-  user.Profile_Image_URL = images;
 };
 
 exports.deleteUser = async (req, res, next) => {
