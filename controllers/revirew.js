@@ -34,9 +34,12 @@ exports.Addreview = async (req, res, next) => {
       userID: user._id,
       productID: prID,
       comment,
-      rate: rating,
+      rate: Math.abs(rating),
     });
     product.feedBack.push(rev._id);
+    product.rate.total += rev.rate;
+    product.rate.number_of_rates += 1;
+    product.rate.avg = product.rate.total / product.rate.number_of_rates;
     await product.save();
     res.status(201).json({ status: "success", data: rev });
   } catch (error) {
@@ -82,6 +85,12 @@ exports.deleteReview = async (req, res, next) => {
     if (!deletedReview) {
       return next(new AppError("review not found", 404));
     }
+    const product = await Products.findById(deletedReview.productID);
+    product.feedBack.splice(product.feedBack.indexOf(deletedReview._id), 1);
+    product.rate.total -= deletedReview.rate;
+    product.rate.number_of_rates -= 1;
+    product.rate.avg = product.rate.total / product.rate.number_of_rates || 0;
+    await product.save();
     res.status(200).json({ data: "deleted successfuly" });
   } catch (error) {
     next(error);

@@ -3,7 +3,11 @@ const ProductSchema = mongoose.Schema(
   {
     name: { type: String, required: true, unique: true },
     images: { type: [String] },
-    rate: { type: Number, default: 1.5 },
+    rate: {
+      total: { type: Number, default: 0 },
+      number_of_rates: { type: Number, default: 0 },
+      avg: { type: Number, default: 4 },
+    },
     price: {
       type: Number,
       required: true,
