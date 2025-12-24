@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const helmet = require("helmet");
+const limiter = require("./utils/rateLimter");
 const UserRouter = require("./routes/userRoutes");
 const ProductRouter = require("./routes/ProductRoutes");
 const CartRouter = require("./routes/CartRoutees");
@@ -30,6 +31,7 @@ app.set("query parser", "extended");
 app.use(express.json());
 app.use(morgan());
 app.use(helmet());
+app.use(limiter);
 app.use(
   cors({
     origin: ["http:localhost:3000", `${process.env.FrontEnd}`],
