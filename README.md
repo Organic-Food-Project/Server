@@ -1,6 +1,6 @@
 # Organic Food API
 
-A backend API for an organic food e-commerce store. Built with Express, MongoDB, JWT auth, Stripe checkout, ImageKit uploads and full CRUD for products, categories, reviews, wishlist and cart.
+A backend API for an organic food e-commerce store. Built with Express, MongoDB, JWT auth, Stripe checkout, ImageKit uploads and full CRUD for products, categories, reviews, wishlist, cart and order/payments analytics.
 
 ## Tech stack
 
@@ -25,6 +25,9 @@ A backend API for an organic food e-commerce store. Built with Express, MongoDB,
 - Stripe checkout + webhook handling
 - Image upload & validation (png/jpg/jpeg/webp/svg)
 - Auto-create first admin on initial DB connect
+- Order history & payments (persisted payments, user purchase history)
+- Analytics endpoint (basic site metrics: happy customers, orders, uptime years)
+- Global rate limiting (100 requests per 1 minutes per IP)
 
 ## Latest updates / Recent features
 
@@ -38,6 +41,11 @@ A backend API for an organic food e-commerce store. Built with Express, MongoDB,
 - Stripe improvements: metadata attachment to sessions & robust webhook signature verification using STRIPE_WEBHOOK_SECRET.
 - Image upload validation using file-type to validate actual content type (not only file extension).
 - Project is Vercel-ready with serverless entry (`index.js`).
+- Analytics endpoint added at `/api/v1/analytics` returning simple aggregated metrics (years active, happy customers, total orders).
+- Order history endpoints for users with pagination and order detail retrieval.
+- Payment model added (`modles/paymentSchema.js`) to store completed payments and connect them to user purchase history.
+- Small testing utilities: `Testing.js` and `testing.html` included for quick manual checks.
+- Rate limiting added globally via `express-rate-limit` (100 requests per 15 minutes per IP).
 
 ## Quick start
 
@@ -93,6 +101,8 @@ Base route groups and main endpoints. See `routes/` for details.
   - PUT /updatepassword
   - PUT /updateuser
   - PUT /updateImage
+  - GET /orderhistory (protected) — paginated list of user's past orders
+  - GET /:orderid (protected) — get details for a specific order (must belong to user)
 
 - Products (`/api/v1/products`)
 
@@ -128,8 +138,16 @@ Base route groups and main endpoints. See `routes/` for details.
   - DELETE /
 
 - Checkout & Webhook (`/api/v1/checkout`)
+
   - GET / (create checkout session)
   - POST /webhook-checkout (raw body required; verifies Stripe signature)
+
+- Analytics (`/api/v1/analytics`)
+
+  - GET / (returns aggregated metrics: happy customers, total orders, years active)
+
+- Orders / Payments (model + endpoints)
+  - Payments are stored via `modles/paymentSchema.js` and linked to user `purchase_history` for order history retrieval
 
 ## Example requests
 
@@ -197,3 +215,20 @@ ISC (see package.json)
 ## Base API URL
 
 https://organicfood-server.vercel.app/api/v1
+
+## Rate Limiting
+
+- Library: express-rate-limit (see `utils/rateLimter.js`).
+- Policy: 100 requests per 15 minutes per IP.
+- Headers: standard headers enabled (draft-8), legacy headers disabled.
+- Status: returns HTTP 429 when exceeded.
+- Mounting: global middleware via `app.use(limiter)` in `app.js`.
+
+Example 429 response:
+
+```json
+{
+  "status": "Failed",
+  "error": "You Have Reached the Limit try again in 15min"
+}
+```
