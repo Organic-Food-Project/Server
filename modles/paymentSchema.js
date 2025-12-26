@@ -4,9 +4,15 @@ const PaymentSchema = mongoose.Schema(
   {
     products: [
       {
-        type: mongoose.Schema.ObjectId,
-        required: [true, "A Payment must have products"],
-        ref: "Product",
+        productID: {
+          type: mongoose.Schema.ObjectId,
+          required: [true, "A Payment must have productID"],
+          ref: "Product",
+        },
+        quantity: {
+          type: Number,
+          required: [true, "A Payment must have quantity"],
+        },
       },
     ],
     user: {

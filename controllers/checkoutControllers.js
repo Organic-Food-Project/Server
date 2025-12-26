@@ -50,28 +50,43 @@ exports.checkout = async (req, res, next) => {
 };
 
 const AddPayment = async (session) => {
-  const user = await User.findOne({ email: session.customer_email }).select(
-    "_id purchase_history Cart"
-  );
-  const product_data = JSON.parse(session.metadata.products_data);
-  const payment = await Payment.create({
-    products: product_data.map((el) => {
-      return { productID: el.id, quantity: el.quantity };
-    }),
-    user: user._id,
-    total: session.amount_total / 100,
-  });
-  console.log(payment);
-  for (const i of product_data) {
-    const product = await Products.findById(i.id);
-    if (product) {
-      product.quantity = Math.max(product.quantity - i.quantity, 0);
-      await product.save();
+  try {
+    const user = await User.findOne({ email: session.customer_email }).select(
+      "_id purchase_history Cart"
+    );
+    if (!user) {
+      console.error(`User not found for email ${session.customer_email}`);
+      return;
     }
+
+    const product_data = JSON.parse(session.metadata.products_data || "[]");
+
+    const payment = await Payment.create({
+      products: product_data.map((el) => ({
+        productID: el.id,
+        quantity: Number(el.quantity) || 0,
+      })),
+      user: user._id,
+      total: session.amount_total / 100,
+    });
+
+    for (const i of product_data) {
+      const product = await Products.findById(i.id);
+      if (product) {
+        product.quantity = Math.max(
+          product.quantity - Number(i.quantity || 0),
+          0
+        );
+        await product.save();
+      }
+    }
+
+    user.purchase_history.push(payment._id);
+    user.Cart = [];
+    await user.save();
+  } catch (error) {
+    console.error("AddPayment error", error);
   }
-  user.purchase_history.push(payment._id);
-  user.Cart = [];
-  await user.save();
 };
 
 exports.Webhook_checkout = async (req, res, next) => {
