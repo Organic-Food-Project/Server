@@ -36,6 +36,10 @@ exports.Addreview = async (req, res, next) => {
       comment,
       rate: Math.abs(rating),
     });
+    await rev.populate({
+      path: "userID",
+      select: "firstName lastName Profile_Image_URL _id",
+    });
     product.feedBack.push(rev._id);
     product.rate.total += rev.rate;
     product.rate.number_of_rates += 1;
