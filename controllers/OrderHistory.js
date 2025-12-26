@@ -7,7 +7,7 @@ exports.orderHistory = async (req, res, next) => {
     if (!user) {
       throw new AppError("sign in again");
     }
-    const limit = req.query.limit * 1 || 1;
+    const limit = req.query.limit * 1 || 10;
     const page = req.query.page * 1 || 1;
     const skip = (page - 1) * limit;
     let orders = Payment.find(
@@ -16,7 +16,7 @@ exports.orderHistory = async (req, res, next) => {
       },
       "_id createdAt total"
     );
-    orders.skip(skip).limit(limit);
+    orders.skip(skip).limit(limit).sort("-createdAt");
     if (req.query.page) {
       if (skip >= req.user.purchase_history.length) {
         res.status(200).json({
@@ -50,7 +50,10 @@ exports.getOrderById = async (req, res, next) => {
     if (!req.user.purchase_history.includes(orderid)) {
       throw new AppError("you don't own this order", 401);
     }
-    const order = await Payment.findById(orderid);
+    const order = await Payment.findById(orderid).populate({
+      path: "products.productID",
+      select: "name price images",
+    });
     if (!order) {
       throw new AppError("Order Not Found", 404);
     }
