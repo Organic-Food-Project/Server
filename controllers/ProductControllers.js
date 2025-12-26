@@ -20,7 +20,7 @@ exports.getAllProducts = async (req, res, next) => {
         Final["category"] = { $in: query.category };
       }
       if (query.rate) {
-        Final["rate"] = query.rate ? { $gte: query.rate } : { $gte: 0 };
+        Final["rate.avg"] = query.rate ? { $gte: query.rate } : { $gte: 0 };
       }
     }
     //Search

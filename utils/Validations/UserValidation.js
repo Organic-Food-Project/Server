@@ -4,8 +4,8 @@ exports.SignUpSchema = joi.object({
   email: joi.string().email().required(),
   password: joi.string().min(6).required(),
   confirmPassword: joi.string().required(),
-  firstName: joi.string().max(10).required(),
-  lastName: joi.string().max(10).required(),
+  firstName: joi.string().min(1).max(10).required(),
+  lastName: joi.string().min(1).max(10).required(),
 });
 exports.loginSchema = joi.object({
   email: joi.string().email().required(),

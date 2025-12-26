@@ -99,6 +99,7 @@ exports.UpdateImage = async (req, res, next) => {
       throw new AppError("Please Provide Profile Image", 400);
     }
     user.Profile_Image_URL = images;
+    await user.save();
     Response(res, 200, "Image Edited Successfully");
   } catch (error) {
     next(error);

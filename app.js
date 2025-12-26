@@ -55,6 +55,16 @@ app.get("/", (req, res) => {
 connectDB(uri);
 app.use((err, req, res, next) => {
   console.error(err.stack);
+  switch (err.name) {
+    case "TokenExpiredError": {
+      err.statusCode = 401;
+      break;
+    }
+    case "ValidationError": {
+      err.statusCode = 400;
+      break;
+    }
+  }
   const status = err.statusCode || 500;
   const message = err.message || "Internal Error";
   res.status(status).json({ message });
