@@ -56,11 +56,12 @@ const AddPayment = async (session) => {
   const product_data = JSON.parse(session.metadata.products_data);
   const payment = await Payment.create({
     products: product_data.map((el) => {
-      return el.id;
+      return { productID: el.id, quantity: el.quantity };
     }),
     user: user._id,
     total: session.amount_total / 100,
   });
+  console.log(payment);
   for (const i of product_data) {
     const product = await Products.findById(i.id);
     if (product) {
