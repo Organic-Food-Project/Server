@@ -95,10 +95,10 @@ exports.UpdateImage = async (req, res, next) => {
   try {
     const images = await UploadImage(req);
     const user = req.user;
-    if (!images) {
+    if (!images || images.length === 0) {
       throw new AppError("Please Provide Profile Image", 400);
     }
-    user.Profile_Image_URL = images;
+    user.Profile_Image_URL = images[0];
     await user.save();
     Response(res, 200, "Image Edited Successfully");
   } catch (error) {
