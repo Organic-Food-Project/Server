@@ -10,6 +10,9 @@ exports.Addreview = async (req, res, next) => {
         new AppError("Make sure to add comment , prID and rating.", 400)
       );
     }
+    if (rating < 1 || rating > 5) {
+      return next(new AppError("Rating must be between 1 and 5.", 400));
+    }
     const user = req.user;
     const orders = await Payment.find({ _id: { $in: user.purchase_history } });
     if (!orders.length) {
@@ -18,8 +21,9 @@ exports.Addreview = async (req, res, next) => {
         401
       );
     }
-    const exists = orders.some((obj) => {
-      return obj.products.includes(prID);
+    // console.log(orders);
+    const exists = orders.some((order) => {
+      return order.products.some((item) => item.productID.toString() === prID);
     });
     if (!exists) {
       return next(
@@ -43,7 +47,10 @@ exports.Addreview = async (req, res, next) => {
     product.feedBack.push(rev._id);
     product.rate.total += rev.rate;
     product.rate.number_of_rates += 1;
-    product.rate.avg = product.rate.total / product.rate.number_of_rates;
+    product.rate.avg =
+      product.rate.number_of_rates > 0
+        ? product.rate.total / product.rate.number_of_rates
+        : 0;
     await product.save();
     res.status(201).json({ status: "success", data: rev });
   } catch (error) {
