@@ -31,7 +31,7 @@ app.set("query parser", "extended");
 app.use(express.json());
 app.use(morgan());
 app.use(helmet());
-// app.use(limiter);
+app.use(limiter);
 app.use(
   cors({
     origin: ["http:localhost:3000", `${process.env.FrontEnd}`],
