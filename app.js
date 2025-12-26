@@ -65,6 +65,9 @@ app.use((err, req, res, next) => {
       break;
     }
   }
+  if (err.message.includes("jwt")) {
+    err.statusCode = 401;
+  }
   const status = err.statusCode || 500;
   const message = err.message || "Internal Error";
   res.status(status).json({ message });
