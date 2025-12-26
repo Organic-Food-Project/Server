@@ -59,7 +59,7 @@ const AddPayment = async (session) => {
       return el.id;
     }),
     user: user._id,
-    price: session.amount_total / 100,
+    total: session.amount_total / 100,
   });
   for (const i of product_data) {
     const product = await Products.findById(i.id);
