@@ -155,7 +155,7 @@ exports.addNewProduct = async (req, res, next) => {
       name,
     });
     cat.products.push(product._id);
-    cat.count += product.quantity;
+    cat.count++;
     await cat.save();
     Response(res, 201, product);
   } catch (err) {
@@ -196,6 +196,7 @@ exports.deleteProduct = async (req, res, next) => {
     cat.products = cat.products.filter(
       (id) => id.toString() !== product._id.toString()
     );
+    cat.count--;
     await cat.save();
     Response(res, 200, "Product Deleted Successfuly");
   } catch (err) {

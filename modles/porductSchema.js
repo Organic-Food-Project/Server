@@ -6,7 +6,7 @@ const ProductSchema = mongoose.Schema(
     rate: {
       total: { type: Number, default: 0 },
       number_of_rates: { type: Number, default: 0 },
-      avg: { type: Number, default: 4 },
+      avg: { type: Number, default: 0 },
     },
     price: {
       type: Number,

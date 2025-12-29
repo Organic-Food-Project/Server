@@ -27,9 +27,9 @@ exports.addCategory = async (req, res, next) => {
     if (!user || user.role !== "admin") {
       throw new AppError("You Are Not Allowed To Do This.", 403);
     }
-    const image = await UploadImage(req);
+    let image = await UploadImage(req);
     const { name, count } = req.body || {};
-    if (!name || count || !image) {
+    if (!name || Number(count) || image.length === 0) {
       throw new AppError(
         "Please Provide (name & count = 0 & image) for the category",
         400
@@ -39,6 +39,7 @@ exports.addCategory = async (req, res, next) => {
     if (check) {
       throw new AppError("This Category Exists!", 400);
     }
+    image = image[0];
     const cat = await Categories.create({
       name,
       count,
