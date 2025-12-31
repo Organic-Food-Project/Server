@@ -5,7 +5,7 @@ const UploadImage = require("../middlerwares/Image_kit");
 exports.getallCategories = async (req, res, next) => {
   try {
     const page = req.query.page || 1;
-    const limit = req.query.limit || 1;
+    const limit = req.query.limit || 2;
     const skip = (page - 1) * limit;
     const total = await Categories.countDocuments();
     const categories = await Categories.find().skip(skip).limit(limit);
@@ -18,7 +18,7 @@ exports.getallCategories = async (req, res, next) => {
       },
     });
   } catch (err) {
-    console.error(err);
+    next(err);
   }
 };
 exports.addCategory = async (req, res, next) => {
@@ -28,12 +28,11 @@ exports.addCategory = async (req, res, next) => {
       throw new AppError("You Are Not Allowed To Do This.", 403);
     }
     let image = await UploadImage(req);
-    const { name, count } = req.body || {};
+    const { name } = req.body || {},
+      count = 0;
+
     if (!name || !Number(count) || image.length === 0) {
-      throw new AppError(
-        "Please Provide (name & count = 0 & image) for the category",
-        400
-      );
+      throw new AppError("Please Provide (name & image) for the category", 400);
     }
     const check = await Categories.findOne({ name });
     if (check) {

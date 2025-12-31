@@ -62,9 +62,6 @@ exports.protect = async (req, res, next, options = {}) => {
       throw new AppError("Please Provide Token", 401);
     }
     const confirm = JWT.verify(token, process.env.JWT_SECRET);
-    if (!confirm) {
-      throw new AppError("Not Allowed , Please Re-login.", 401);
-    }
     const user = await User.findOne({ email: confirm.email });
     req.user = user;
     return next();

@@ -85,7 +85,7 @@ const AddPayment = async (session) => {
     user.Cart = [];
     await user.save();
   } catch (error) {
-    console.error("AddPayment error", error);
+    console.error(error);
   }
 };
 

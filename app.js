@@ -56,6 +56,10 @@ connectDB(uri);
 app.use((err, req, res, next) => {
   console.error(err.stack);
   switch (err.name) {
+    case "JsonWebTokenError": {
+      err.statusCode = 401;
+      break;
+    }
     case "TokenExpiredError": {
       err.statusCode = 401;
       break;
