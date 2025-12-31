@@ -66,7 +66,10 @@ exports.protect = async (req, res, next, options = {}) => {
     req.user = user;
     return next();
   } catch (err) {
-    if (options.soft && err.name === "TokenExpiredError") {
+    if (
+      options.soft &&
+      (err.name === "TokenExpiredError" || err.name === "JsonWebTokenError")
+    ) {
       req.user = null;
       return next();
     }

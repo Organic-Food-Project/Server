@@ -29,7 +29,7 @@ app.post(
 
 app.set("query parser", "extended");
 app.use(express.json());
-app.use(morgan());
+app.use(morgan("combined"));
 app.use(helmet());
 app.use(limiter);
 app.use(

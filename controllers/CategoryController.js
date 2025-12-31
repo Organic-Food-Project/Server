@@ -31,7 +31,7 @@ exports.addCategory = async (req, res, next) => {
     const { name } = req.body || {},
       count = 0;
 
-    if (!name || !Number(count) || image.length === 0) {
+    if (!name || image.length === 0) {
       throw new AppError("Please Provide (name & image) for the category", 400);
     }
     const check = await Categories.findOne({ name });
