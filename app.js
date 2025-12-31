@@ -34,7 +34,7 @@ app.use(helmet());
 app.use(limiter);
 app.use(
   cors({
-    origin: ["http:localhost:3000", `${process.env.FrontEnd}`],
+    origin: ["http://localhost:3000", `${process.env.FrontEnd}`],
     credentials: true,
     allowedHeaders: ["Authorization", "Content-Type"],
     methods: ["GET", "POST", "PUT", "OPTIONS", "DELETE"],

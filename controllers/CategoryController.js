@@ -29,7 +29,7 @@ exports.addCategory = async (req, res, next) => {
     }
     let image = await UploadImage(req);
     const { name, count } = req.body || {};
-    if (!name || Number(count) || image.length === 0) {
+    if (!name || !Number(count) || image.length === 0) {
       throw new AppError(
         "Please Provide (name & count = 0 & image) for the category",
         400
