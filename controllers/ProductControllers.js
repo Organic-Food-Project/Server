@@ -38,17 +38,16 @@ exports.getAllProducts = async (req, res, next) => {
         "-name",
         "price",
         "-price",
-        "rate.avg",
-        "-rate.avg",
+        "rate",
+        "-rate",
         "createdAt",
         "-createdAt",
       ];
-      if (!allowed.includes(sort)) {
-        throw new AppError("Invalid sort parameter", 400);
+      if (allowed.includes(sort)) {
+        products = products.sort(
+          sort === "rate" ? "rate.avg" : sort === "-rate" ? "-rate.avg" : sort
+        );
       }
-      products = products.sort(
-        sort === "rating" ? "rate.avg" : sort === "-rating" ? "-rate.avg" : sort
-      );
     } else {
       products = products.sort("-createdAt");
     }
