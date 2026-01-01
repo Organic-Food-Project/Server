@@ -4,6 +4,7 @@ const Products = file.Products;
 const Payment = require("../modles/paymentSchema");
 const Response = require("../middlerwares/Response");
 const User = require("../modles/userSchema");
+const AppError = require("../utils/AppError");
 exports.checkout = async (req, res, next) => {
   try {
     if (req.user.Cart.length <= 0) {
@@ -14,10 +15,14 @@ exports.checkout = async (req, res, next) => {
         const product = await Products.findById(el.productID).select(
           "_id name description images price"
         );
+        const priceCents = Math.round(Number(product.price) * 100);
+        if (!Number.isFinite(priceCents)) {
+          throw new AppError("Invalid product price", 400);
+        }
         return {
           price_data: {
             currency: "usd",
-            unit_amount: product.price * 100,
+            unit_amount: priceCents,
             product_data: {
               name: product.name,
               images: product.images,

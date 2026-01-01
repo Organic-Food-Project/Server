@@ -33,8 +33,22 @@ exports.getAllProducts = async (req, res, next) => {
     // Sort
     if (req.query.sort) {
       let sort = req.query.sort;
-      sort = sort.replaceAll(",", " ");
-      products = products.sort(sort);
+      const allowed = [
+        "name",
+        "-name",
+        "price",
+        "-price",
+        "rate.avg",
+        "-rate.avg",
+        "createdAt",
+        "-createdAt",
+      ];
+      if (!allowed.includes(sort)) {
+        throw new AppError("Invalid sort parameter", 400);
+      }
+      products = products.sort(
+        sort === "rating" ? "rate.avg" : sort === "-rating" ? "-rate.avg" : sort
+      );
     } else {
       products = products.sort("-createdAt");
     }
@@ -169,7 +183,10 @@ exports.updateProduct = async (req, res, next) => {
       throw new AppError("You Are Not Allowed To Do This.", 403);
     }
     const { id } = req.params;
-    const product = await Products.findByIdAndUpdate({ _id: id }, req.body);
+    const product = await Products.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
     if (!product) {
       throw new AppError("Product Not Found", 404);
     }
