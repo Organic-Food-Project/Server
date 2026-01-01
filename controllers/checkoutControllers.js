@@ -4,6 +4,7 @@ const Payment = require("../modles/paymentSchema");
 const Response = require("../middlerwares/Response");
 const AppError = require("../utils/AppError");
 const checkoutSession = require("../modles/TempCheckoutSession");
+const User = require("../modles/userSchema");
 exports.checkout = async (req, res, next) => {
   try {
     if (req.user.Cart.length <= 0) {
@@ -56,45 +57,80 @@ exports.checkout = async (req, res, next) => {
     next(err);
   }
 };
-exports.Webhook_checkout = async (req, res, next) => {
+exports.Webhook_checkout = async (req, res) => {
   const signature = req.headers["stripe-signature"];
   let event;
+
   try {
     event = stripe.webhooks.constructEvent(
       req.body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
     );
-  } catch (error) {
-    return res.status(400).send(`webhook error: ${error.message}`);
+  } catch (err) {
+    return res.status(400).send(`Webhook error: ${err.message}`);
   }
+
   if (event.type === "checkout.session.completed") {
-    console.log(
-      `Payment Done Successfuly for: ${event.data.object.customer_email}`
-    );
     const session = event.data.object;
-    const storedTempSession = await checkoutSession.findById(
+
+    // 1️⃣ Load temp checkout session
+    const tempSession = await checkoutSession.findById(
       session.client_reference_id
     );
-    if (!storedTempSession) {
+
+    if (!tempSession) {
+      // already deleted / expired → ignore safely
       return res.status(200).json({ received: true });
     }
 
-    if (storedTempSession.status === "paid") {
+    // 2️⃣ Idempotency protection
+    if (tempSession.status === "paid") {
       return res.status(200).json({ received: true });
     }
 
-    await Payment.create({
-      products: storedTempSession.products,
-      user: storedTempSession.user,
+    // 3️⃣ Load user
+    const user = await User.findById(tempSession.user).select(
+      "_id Cart purchase_history"
+    );
+
+    if (!user) {
+      console.error("User not found for checkout session");
+      return res.status(200).json({ received: true });
+    }
+
+    // 4️⃣ Create Payment (Stripe is the authority)
+    const payment = await Payment.create({
+      products: tempSession.products,
+      user: user._id,
       total: session.amount_total / 100,
+      currency: session.currency,
       stripeSessionId: session.id,
       stripePaymentIntentId: session.payment_intent,
     });
 
-    storedTempSession.status = "paid";
-    await storedTempSession.save();
+    // 5️⃣ Deduct inventory
+    for (const item of tempSession.products) {
+      const product = await Products.findById(item.productID);
+
+      if (product) {
+        product.quantity = Math.max(
+          product.quantity - Number(item.quantity),
+          0
+        );
+        await product.save();
+      }
+    }
+
+    // 6️⃣ Update user
+    user.purchase_history.push(payment._id);
+    user.Cart = [];
+    await user.save();
+
+    // 7️⃣ Mark temp checkout as paid
+    tempSession.status = "paid";
+    await tempSession.save();
   }
 
-  res.status(200).json({ recieved: true });
+  res.status(200).json({ received: true });
 };
