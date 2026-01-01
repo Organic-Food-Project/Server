@@ -19,15 +19,6 @@ const ProductSchema = mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "catogary",
       required: true,
-      enum: [
-        "Fresh Fruit",
-        "Vegetables",
-        "Cooking",
-        "Snacks",
-        "Beverages",
-        "Beauty & Health",
-        "Bread & Bakery",
-      ],
     },
     feedBack: [{ type: mongoose.Schema.ObjectId, ref: "review" }],
     description: {
