@@ -2,6 +2,16 @@ const Reviews = require("../modles/reviewSchema").reviews;
 const Payment = require("../modles/paymentSchema");
 const Router = require("express").Router();
 
+/**
+ * @openapi
+ * /api/v1/analytics:
+ *   get:
+ *     summary: Get analytics summary
+ *     tags: [Analytics]
+ *     responses:
+ *       200:
+ *         description: Analytics data
+ */
 Router.get("/", async function (req, res, next) {
   try {
     const Years = parseInt(new Date().getFullYear()) - 2025 + 1;
