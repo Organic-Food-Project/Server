@@ -47,13 +47,45 @@ const swaggerUiOptions = {
   ],
   customSiteTitle: "Organic Food Backend Docs",
 };
+const buildSwaggerHtml = (specUrl) => `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>${swaggerUiOptions.customSiteTitle}</title>
+    <link rel="stylesheet" href="${swaggerUiOptions.customCssUrl}" />
+    <style>
+      html, body { margin: 0; padding: 0; }
+    </style>
+  </head>
+  <body>
+    <div id="swagger-ui"></div>
+    <script src="${swaggerUiOptions.customJs[0]}"></script>
+    <script src="${swaggerUiOptions.customJs[1]}"></script>
+    <script>
+      window.onload = function () {
+        window.ui = SwaggerUIBundle({
+          url: "${specUrl}",
+          dom_id: "#swagger-ui",
+          presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+          layout: "StandaloneLayout"
+        });
+      };
+    </script>
+  </body>
+</html>`;
+const getSpecUrl = (req) => {
+  const protocol = req.headers["x-forwarded-proto"] || req.protocol;
+  const host = req.headers["x-forwarded-host"] || req.get("host");
+  return `${protocol}://${host}/api-docs.json`;
+};
 app.get("/api-docs", (req, res) => {
   res.setHeader("Content-Type", "text/html");
-  res.send(swaggerUi.generateHTML(openApiSpec, swaggerUiOptions));
+  res.send(buildSwaggerHtml(getSpecUrl(req)));
 });
 app.get("/api-docs/", (req, res) => {
   res.setHeader("Content-Type", "text/html");
-  res.send(swaggerUi.generateHTML(openApiSpec, swaggerUiOptions));
+  res.send(buildSwaggerHtml(getSpecUrl(req)));
 });
 app.get("/api-docs.json", (req, res) => {
   res.json(openApiSpec);
