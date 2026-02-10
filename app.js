@@ -39,7 +39,25 @@ const options = {
   apis: ["./routes/*.js"],
 };
 const openApiSpec = swaggerJsDoc(options);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openApiSpec));
+const swaggerUiOptions = {
+  customCssUrl: "https://unpkg.com/swagger-ui-dist@5/swagger-ui.css",
+  customJs: [
+    "https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js",
+    "https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js",
+  ],
+  customSiteTitle: "Organic Food Backend Docs",
+};
+app.get("/api-docs", (req, res) => {
+  res.setHeader("Content-Type", "text/html");
+  res.send(swaggerUi.generateHTML(openApiSpec, swaggerUiOptions));
+});
+app.get("/api-docs/", (req, res) => {
+  res.setHeader("Content-Type", "text/html");
+  res.send(swaggerUi.generateHTML(openApiSpec, swaggerUiOptions));
+});
+app.get("/api-docs.json", (req, res) => {
+  res.json(openApiSpec);
+});
 app.post(
   "/webhook-checkout",
   express.raw({ type: "application/json" }),
