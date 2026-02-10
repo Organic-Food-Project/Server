@@ -46,6 +46,7 @@ A backend API for an organic food e-commerce store. Built with Express, MongoDB,
 - Payment model added (`modles/paymentSchema.js`) to store completed payments and connect them to user purchase history.
 - Small testing utilities: `Testing.js` and `testing.html` included for quick manual checks.
 - Rate limiting added globally via `express-rate-limit` (100 requests per 15 minutes per IP).
+- Swagger/OpenAPI docs added via JSDoc in routes with UI at /api-docs.
 
 ## Quick start
 
@@ -63,6 +64,11 @@ A backend API for an organic food e-commerce store. Built with Express, MongoDB,
    ```sh
    npm run dev
    ```
+5. Open Swagger UI:
+
+```
+http://localhost:3000/api-docs
+```
 
 ## Environment variables
 
@@ -93,8 +99,9 @@ Notes:
 
 Base route groups and main endpoints. See `routes/` for details.
 
-- Users (`/api/v1/users`)
+Swagger/OpenAPI docs are generated from route-level JSDoc comments and served at /api-docs (configured in app.js).
 
+- Users (`/api/v1/users`)
   - POST /signup
   - POST /login
   - GET / (protected)
@@ -105,7 +112,6 @@ Base route groups and main endpoints. See `routes/` for details.
   - GET /:orderid (protected) — get details for a specific order (must belong to user)
 
 - Products (`/api/v1/products`)
-
   - GET / (supports pagination / filter / sort / search)
   - GET /:name
   - POST / (admin + images)
@@ -113,37 +119,31 @@ Base route groups and main endpoints. See `routes/` for details.
   - DELETE /:id
 
 - Categories (`/api/v1/categories`)
-
   - GET /
   - POST / (admin + image)
   - DELETE /:name
 
 - Cart (`/api/v1/cart`)
-
   - POST /
   - PATCH /
   - DELETE /
   - GET /
 
 - Wishlist (`/api/v1/wishlist`)
-
   - GET /
   - POST /
   - DELETE /
 
 - Reviews (`/api/v1/reviews`)
-
   - GET /
   - POST /
   - DELETE /
 
 - Checkout & Webhook (`/api/v1/checkout`)
-
   - GET / (create checkout session)
   - POST /webhook-checkout (raw body required; verifies Stripe signature)
 
 - Analytics (`/api/v1/analytics`)
-
   - GET / (returns aggregated metrics: happy customers, total orders, years active)
 
 - Orders / Payments (model + endpoints)

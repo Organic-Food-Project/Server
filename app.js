@@ -31,7 +31,10 @@ const options = {
       description:
         "This is the documentation for the backend part of Ecofila / organic food",
     },
-    servers: [{ url: "http://localhost:3000" }],
+    servers: [
+      { url: `http://localhost:${process.env.PORT}` },
+      { url: "https://organicfood-server.vercel.app/" },
+    ],
   },
   apis: ["./routes/*.js"],
 };
@@ -46,7 +49,11 @@ app.post(
 app.set("query parser", "extended");
 app.use(express.json());
 app.use(morgan("combined"));
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  }),
+);
 app.use(limiter);
 app.use(
   cors({
