@@ -18,13 +18,29 @@ const cors = require("cors");
 const morgan = require("morgan");
 const uri = process.env.MONGODB_URI.replace(
   "<db_password>",
-  process.env.ATLAS_PASSWORD
+  process.env.ATLAS_PASSWORD,
 );
-
+const swaggerUi = require("swagger-ui-express");
+const swaggerJsDoc = require("swagger-jsdoc");
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Organic Food Backend Docs",
+      version: "1.0.0",
+      description:
+        "This is the documentation for the backend part of Ecofila / organic food",
+    },
+    servers: [{ url: "http://localhost:3000" }],
+  },
+  apis: ["./routes/*.js"],
+};
+const openApiSpec = swaggerJsDoc(options);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openApiSpec));
 app.post(
   "/webhook-checkout",
   express.raw({ type: "application/json" }),
-  checkoutController.Webhook_checkout
+  checkoutController.Webhook_checkout,
 );
 
 app.set("query parser", "extended");
@@ -38,7 +54,7 @@ app.use(
     credentials: true,
     allowedHeaders: ["Authorization", "Content-Type"],
     methods: ["GET", "POST", "PUT", "OPTIONS", "DELETE"],
-  })
+  }),
 );
 app.use("/api/v1/users", UserRouter);
 app.use("/api/v1/analytics", analyticsRouter);
