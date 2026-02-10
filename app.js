@@ -23,8 +23,8 @@ const uri = process.env.MONGODB_URI.replace(
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
 const options = {
-  openapi: "3.0.0",
   definition: {
+    openapi: "3.0.0",
     info: {
       title: "Organic Food Backend Docs",
       version: "1.0.0",
@@ -35,8 +35,8 @@ const options = {
   },
   apis: ["./routes/*.js"],
 };
-const precs = swaggerJsDoc(options);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(precs));
+const openApiSpec = swaggerJsDoc(options);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openApiSpec));
 app.post(
   "/webhook-checkout",
   express.raw({ type: "application/json" }),

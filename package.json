@@ -5,9 +5,7 @@
   "main": "app.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon app.js",
-    "start": "cross-env NODE_ENV=production node index.js",
-    "seed:products": "node fake.js --count=25",
-    "seed:reset": "node fake.js --count=25 --reset=true"
+    "start": "cross-env NODE_ENV=production node index.js"
   },
   "author": "",
   "license": "ISC",
@@ -31,7 +29,6 @@
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
-    "@faker-js/faker": "^10.1.0",
     "@types/express": "^5.0.3",
     "@types/node": "^24.7.1",
     "cross-env": "^10.0.0"
