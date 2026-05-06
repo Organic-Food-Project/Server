@@ -1,11 +1,18 @@
 const parseForwarded = require("forwarded-parse");
-const { rateLimit, keyGenerator } = require("express-rate-limit");
+const { rateLimit, ipKeyGenerator } = require("express-rate-limit");
+
+const NUMBER_OF_PROXIES_TO_TRUST = 1;
+
 const limiter = rateLimit({
   keyGenerator: (req, res) => {
     let ip = req.ip;
     try {
-      const forwards = parseForwarded(req.headers.forwarded);
-      ip = forwards[forwards.length - NUMBER_OF_PROXIES_TO_TRUST].for;
+      if (req.headers.forwarded) {
+        const forwards = parseForwarded(req.headers.forwarded);
+        if (forwards && Array.isArray(forwards) && forwards.length > 0) {
+          ip = forwards[forwards.length - NUMBER_OF_PROXIES_TO_TRUST].for;
+        }
+      }
     } catch (ex) {
       console.error(
         `Error parsing Forwarded header ${req.headers.forwarded} from ${req.ip}:`,
@@ -27,20 +34,3 @@ const limiter = rateLimit({
 });
 
 module.exports = limiter;
-
-// rateLimit({
-// keyGenerator: (req, res) => {
-// let ip = req.ip
-// try {
-// const forwards = parseForwarded(req.headers.forwarded)
-// ip = forwards[forwards.length - NUMBER_OF_PROXIES_TO_TRUST].for
-// } catch (ex) {
-// console.error(
-// `Error parsing Forwarded header ${req.headers.forwarded} from ${req.ip}:`,
-// ex,
-// )
-// }
-// return ipKeyGenerator(ip)
-// },
-
-// }),
