@@ -104,9 +104,6 @@ exports.Webhook_checkout = async (req, res) => {
       products: tempSession.products,
       user: user._id,
       total: session.amount_total / 100,
-      currency: session.currency,
-      stripeSessionId: session.id,
-      stripePaymentIntentId: session.payment_intent,
     });
 
     // 5️⃣ Deduct inventory
